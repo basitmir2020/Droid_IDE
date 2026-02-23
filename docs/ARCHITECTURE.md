@@ -1,24 +1,68 @@
 ﻿# System Architecture
 
-DroidIDE follows a modular clean architecture.
+DroidIDE follows a **modular clean architecture** with strict separation of concerns. Each project has a single responsibility and dependencies flow inward toward the Core domain layer.
 
-App (UI Layer)
-↓
-Feature Layers
-↓
-Core (Domain)
+---
 
-## Principles
+## Dependency Diagram
 
-1. UI must not contain business logic.
-2. Core must not depend on any other project.
-3. Infrastructure handles OS interactions.
-4. Editor handles Roslyn and IntelliSense.
-5. Runtime manages dotnet CLI execution.
-6. Each layer has a single responsibility.
+```
+┌─────────────────────────────────────────────────┐
+│                DroidIDE.App                     │
+│           (UI Layer — .NET MAUI)                │
+│  Views ← ViewModels ← Services ← DI Container  │
+└──────────┬────────┬────────┬────────┬───────────┘
+           │        │        │        │
+     ┌─────▼──┐ ┌───▼───┐ ┌─▼────┐ ┌─▼──────────┐
+     │Terminal │ │Editor │ │ Git  │ │ProjectSystem│
+     │ Layer  │ │ Layer │ │Layer │ │   Layer     │
+     └───┬────┘ └───┬───┘ └──┬───┘ └─────┬──────┘
+         │          │        │            │
+    ┌────▼──────────▼────────▼────────────▼──────┐
+    │          DroidIDE.Infrastructure            │
+    │    (File System, Process, Linux, Security)  │
+    └─────────────────┬──────────────────────────┘
+                      │
+              ┌───────▼───────┐
+              │ DroidIDE.Core │
+              │   (Domain)    │
+              │ Models, Enums │
+              │  Interfaces   │
+              │  Constants    │
+              └───────────────┘
+```
 
-This ensures:
-- Maintainability
-- Scalability
-- Testability
-- Long-term extensibility
+---
+
+## Layer Rules
+
+| Rule | Description |
+|------|-------------|
+| **Core is independent** | Core depends on nothing. All other layers depend on Core. |
+| **UI never touches OS** | App layer accesses file system, processes, and CLI only through injected interfaces. |
+| **Dependencies flow inward** | Feature layers depend on Infrastructure and Core, never on App. |
+| **No circular references** | Each project reference is strictly one-directional. |
+| **Interfaces live in Core** | All service contracts (`IFileSystemService`, `IProcessManager`, etc.) are defined in Core and implemented in other layers. |
+
+---
+
+## Design Patterns
+
+| Pattern | Usage |
+|---------|-------|
+| **MVVM** | All UI views have matching ViewModels with data binding via `INotifyPropertyChanged`. |
+| **Dependency Injection** | All services registered in `MauiProgram.cs` and injected via constructors. |
+| **Repository Pattern** | `IFileSystemService` abstracts file I/O from the domain. |
+| **Command Pattern** | `RelayCommand` / `AsyncRelayCommand` for UI actions. |
+| **Observer Pattern** | `ITerminalService.OutputReceived` event for real-time terminal streaming. |
+| **Strategy Pattern** | `EditorService.DetectLanguage()` maps file extensions to Monaco language IDs. |
+
+---
+
+## Key Design Decisions
+
+1. **MAUI ContentView, not ContentPage** — All child views are `ContentView` subclasses to enable nesting within the single `MainShell` ContentPage layout.
+2. **Singleton services** — Infrastructure services and ViewModels are singletons since the IDE has a single long-lived session.
+3. **File-based credential storage** — Infrastructure targets `net10.0` (not platform-specific), so MAUI SecureStorage is unavailable. Credentials use JSON file storage in the sandboxed app directory instead.
+4. **Source-generated Regex** — Terminal parsers use `[GeneratedRegex]` for compile-time optimized pattern matching of ANSI codes and MSBuild output.
+5. **Sub-ViewModel distribution** — `MainShellViewModel` owns sub-ViewModels (`Explorer`, `Editor`, `Terminal`) and `MainShell.xaml` distributes them to child views via `BindingContext` bindings.
