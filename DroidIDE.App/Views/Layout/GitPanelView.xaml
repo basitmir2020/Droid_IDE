@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:DroidIDE.App.ViewModels"
+             x:Class="DroidIDE.App.Views.Layout.GitPanelView"
+             x:DataType="vm:GitViewModel"
+             BackgroundColor="#252526">
+
+    <Grid RowSpacing="0">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="36"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Grid Grid.Row="0" BackgroundColor="#252526" Padding="12,0">
+            <Label Text="SOURCE CONTROL"
+                   TextColor="#BBBBBB"
+                   FontSize="11"
+                   FontAttributes="Bold"
+                   VerticalOptions="Center"/>
+
+            <HorizontalStackLayout HorizontalOptions="End" Spacing="8"
+                                    VerticalOptions="Center">
+                <ImageButton Source="refresh"
+                             WidthRequest="16" HeightRequest="16"
+                             BackgroundColor="Transparent"
+                             Command="{Binding RefreshCommand}"/>
+            </HorizontalStackLayout>
+        </Grid>
+
+        <!-- Branch info + commit -->
+        <VerticalStackLayout Grid.Row="1" Padding="8,4" Spacing="6"
+                              IsVisible="{Binding IsRepoOpen}">
+
+            <!-- Current branch -->
+            <Grid ColumnSpacing="6">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Label Grid.Column="0" Text="⎇" TextColor="#0078D4" FontSize="16"
+                       VerticalOptions="Center"/>
+                <Label Grid.Column="1" Text="{Binding CurrentBranch}"
+                       TextColor="#D4D4D4" FontSize="13"
+                       VerticalOptions="Center"/>
+            </Grid>
+
+            <!-- Commit message -->
+            <Entry Text="{Binding CommitMessage, Mode=TwoWay}"
+                   Placeholder="Commit message..."
+                   PlaceholderColor="#888888"
+                   TextColor="#D4D4D4"
+                   BackgroundColor="#3C3C3C"
+                   FontSize="13"
+                   ReturnCommand="{Binding CommitCommand}"/>
+
+            <!-- Action buttons -->
+            <Grid ColumnSpacing="4">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Button Grid.Column="0" Text="✓ Commit"
+                        Command="{Binding CommitCommand}"
+                        FontSize="11" Padding="4,6"
+                        BackgroundColor="#0078D4" TextColor="White"
+                        CornerRadius="4"/>
+
+                <Button Grid.Column="1" Text="↓ Pull"
+                        Command="{Binding PullCommand}"
+                        FontSize="11" Padding="4,6"
+                        BackgroundColor="#3C3C3C" TextColor="#D4D4D4"
+                        CornerRadius="4"/>
+
+                <Button Grid.Column="2" Text="↑ Push"
+                        Command="{Binding PushCommand}"
+                        FontSize="11" Padding="4,6"
+                        BackgroundColor="#3C3C3C" TextColor="#D4D4D4"
+                        CornerRadius="4"/>
+            </Grid>
+
+            <!-- Branch management -->
+            <Grid ColumnSpacing="6">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <Entry Grid.Column="0"
+                       Text="{Binding NewBranchName, Mode=TwoWay}"
+                       Placeholder="New branch name..."
+                       PlaceholderColor="#666666"
+                       TextColor="#D4D4D4"
+                       BackgroundColor="#3C3C3C"
+                       FontSize="11"/>
+
+                <Button Grid.Column="1" Text="Create"
+                        Command="{Binding CreateBranchCommand}"
+                        FontSize="11" Padding="8,4"
+                        BackgroundColor="#3C3C3C" TextColor="#D4D4D4"
+                        CornerRadius="4"/>
+            </Grid>
+        </VerticalStackLayout>
+
+        <!-- Changes header -->
+        <Grid Grid.Row="2" Padding="8,6" BackgroundColor="#2D2D2D"
+              IsVisible="{Binding IsRepoOpen}">
+            <Label TextColor="#BBBBBB" FontSize="11" FontAttributes="Bold">
+                <Label.FormattedText>
+                    <FormattedString>
+                        <Span Text="CHANGES"/>
+                        <Span Text=" "/>
+                        <Span Text="{Binding ChangedFiles.Count, StringFormat='({0})'}"
+                              TextColor="#888888"/>
+                    </FormattedString>
+                </Label.FormattedText>
+            </Label>
+
+            <Label Text="+ Stage All"
+                   TextColor="#0078D4"
+                   FontSize="11"
+                   HorizontalOptions="End"
+                   VerticalOptions="Center">
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding StageAllCommand}"/>
+                </Label.GestureRecognizers>
+            </Label>
+        </Grid>
+
+        <!-- Changed files list -->
+        <CollectionView Grid.Row="3"
+                         ItemsSource="{Binding ChangedFiles}"
+                         IsVisible="{Binding IsRepoOpen}">
+
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="vm:GitFileEntry">
+                    <Grid Padding="12,6" ColumnSpacing="8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="24"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Label Grid.Column="0"
+                               Text="{Binding FileName}"
+                               TextColor="#D4D4D4"
+                               FontSize="12"
+                               VerticalOptions="Center"/>
+
+                        <Label Grid.Column="1"
+                               Text="{Binding StatusLabel}"
+                               TextColor="{Binding StatusColor}"
+                               FontSize="12"
+                               FontAttributes="Bold"
+                               HorizontalTextAlignment="Center"
+                               VerticalOptions="Center"/>
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+
+            <CollectionView.EmptyView>
+                <Label Text="No changes"
+                       TextColor="#888888"
+                       FontSize="12"
+                       Padding="12,16"
+                       HorizontalOptions="Center"/>
+            </CollectionView.EmptyView>
+        </CollectionView>
+
+        <!-- No repo state -->
+        <VerticalStackLayout Grid.Row="1" Grid.RowSpan="3"
+                              VerticalOptions="Center"
+                              HorizontalOptions="Center"
+                              Padding="20"
+                              IsVisible="{Binding IsRepoOpen, Converter={StaticResource InverseBoolConverter}}">
+            <Label Text="No repository"
+                   TextColor="#888888"
+                   FontSize="13"
+                   HorizontalOptions="Center"/>
+            <Label Text="Open a folder with a Git repository"
+                   TextColor="#666666"
+                   FontSize="11"
+                   HorizontalOptions="Center" Margin="0,4,0,0"/>
+        </VerticalStackLayout>
+
+        <!-- Loading -->
+        <ActivityIndicator Grid.Row="3"
+                            IsRunning="{Binding IsBusy}"
+                            IsVisible="{Binding IsBusy}"
+                            Color="#0078D4"
+                            VerticalOptions="Center"
+                            HorizontalOptions="Center"/>
+    </Grid>
+</ContentView>

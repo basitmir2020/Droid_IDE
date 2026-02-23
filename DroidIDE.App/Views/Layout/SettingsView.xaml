@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:DroidIDE.App.ViewModels"
+             x:Class="DroidIDE.App.Views.Layout.SettingsView"
+             x:DataType="vm:SettingsViewModel"
+             BackgroundColor="#1E1E1E">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="16" MaximumWidthRequest="600">
+
+            <!-- Title -->
+            <Label Text="Settings"
+                   TextColor="#D4D4D4"
+                   FontSize="24"
+                   FontAttributes="Bold"/>
+
+            <!-- ── Appearance Section ── -->
+            <Frame BackgroundColor="#252526" BorderColor="#3C3C3C"
+                   CornerRadius="8" Padding="16">
+                <VerticalStackLayout Spacing="12">
+
+                    <Label Text="APPEARANCE"
+                           TextColor="#0078D4"
+                           FontSize="11"
+                           FontAttributes="Bold"/>
+
+                    <!-- Theme -->
+                    <Grid ColumnSpacing="12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="150"/>
+                        </Grid.ColumnDefinitions>
+
+                        <VerticalStackLayout Grid.Column="0">
+                            <Label Text="Theme"
+                                   TextColor="#D4D4D4" FontSize="13"/>
+                            <Label Text="Controls the overall color scheme"
+                                   TextColor="#888888" FontSize="11"/>
+                        </VerticalStackLayout>
+
+                        <Picker Grid.Column="1"
+                                SelectedItem="{Binding Theme, Mode=TwoWay}"
+                                TextColor="#D4D4D4"
+                                BackgroundColor="#3C3C3C">
+                            <Picker.ItemsSource>
+                                <x:Array Type="{x:Type x:String}">
+                                    <x:String>Dark</x:String>
+                                    <x:String>Light</x:String>
+                                </x:Array>
+                            </Picker.ItemsSource>
+                        </Picker>
+                    </Grid>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- ── Editor Section ── -->
+            <Frame BackgroundColor="#252526" BorderColor="#3C3C3C"
+                   CornerRadius="8" Padding="16">
+                <VerticalStackLayout Spacing="12">
+
+                    <Label Text="EDITOR"
+                           TextColor="#0078D4"
+                           FontSize="11"
+                           FontAttributes="Bold"/>
+
+                    <!-- Font Size -->
+                    <Grid ColumnSpacing="12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="80"/>
+                        </Grid.ColumnDefinitions>
+
+                        <VerticalStackLayout Grid.Column="0">
+                            <Label Text="Font Size"
+                                   TextColor="#D4D4D4" FontSize="13"/>
+                            <Label Text="Controls the editor font size in pixels"
+                                   TextColor="#888888" FontSize="11"/>
+                        </VerticalStackLayout>
+
+                        <Entry Grid.Column="1"
+                               Text="{Binding FontSize, Mode=TwoWay}"
+                               Keyboard="Numeric"
+                               TextColor="#D4D4D4"
+                               BackgroundColor="#3C3C3C"
+                               FontSize="13"/>
+                    </Grid>
+
+                    <!-- Font Family -->
+                    <Grid ColumnSpacing="12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="150"/>
+                        </Grid.ColumnDefinitions>
+
+                        <VerticalStackLayout Grid.Column="0">
+                            <Label Text="Font Family"
+                                   TextColor="#D4D4D4" FontSize="13"/>
+                            <Label Text="Controls the editor font family"
+                                   TextColor="#888888" FontSize="11"/>
+                        </VerticalStackLayout>
+
+                        <Entry Grid.Column="1"
+                               Text="{Binding FontFamily, Mode=TwoWay}"
+                               TextColor="#D4D4D4"
+                               BackgroundColor="#3C3C3C"
+                               FontSize="13"/>
+                    </Grid>
+
+                    <!-- Tab Size -->
+                    <Grid ColumnSpacing="12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="80"/>
+                        </Grid.ColumnDefinitions>
+
+                        <VerticalStackLayout Grid.Column="0">
+                            <Label Text="Tab Size"
+                                   TextColor="#D4D4D4" FontSize="13"/>
+                            <Label Text="Number of spaces per tab"
+                                   TextColor="#888888" FontSize="11"/>
+                        </VerticalStackLayout>
+
+                        <Entry Grid.Column="1"
+                               Text="{Binding TabSize, Mode=TwoWay}"
+                               Keyboard="Numeric"
+                               TextColor="#D4D4D4"
+                               BackgroundColor="#3C3C3C"
+                               FontSize="13"/>
+                    </Grid>
+
+                    <!-- Toggle settings -->
+                    <Grid ColumnSpacing="12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Label Grid.Column="0" Text="Word Wrap"
+                               TextColor="#D4D4D4" FontSize="13"
+                               VerticalOptions="Center"/>
+                        <Switch Grid.Column="1"
+                                IsToggled="{Binding WordWrap, Mode=TwoWay}"
+                                OnColor="#0078D4"
+                                ThumbColor="#D4D4D4"/>
+                    </Grid>
+
+                    <Grid ColumnSpacing="12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Label Grid.Column="0" Text="Minimap"
+                               TextColor="#D4D4D4" FontSize="13"
+                               VerticalOptions="Center"/>
+                        <Switch Grid.Column="1"
+                                IsToggled="{Binding Minimap, Mode=TwoWay}"
+                                OnColor="#0078D4"
+                                ThumbColor="#D4D4D4"/>
+                    </Grid>
+
+                    <Grid ColumnSpacing="12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Label Grid.Column="0" Text="Line Numbers"
+                               TextColor="#D4D4D4" FontSize="13"
+                               VerticalOptions="Center"/>
+                        <Switch Grid.Column="1"
+                                IsToggled="{Binding LineNumbers, Mode=TwoWay}"
+                                OnColor="#0078D4"
+                                ThumbColor="#D4D4D4"/>
+                    </Grid>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- ── Auto Save Section ── -->
+            <Frame BackgroundColor="#252526" BorderColor="#3C3C3C"
+                   CornerRadius="8" Padding="16">
+                <VerticalStackLayout Spacing="12">
+
+                    <Label Text="AUTO SAVE"
+                           TextColor="#0078D4"
+                           FontSize="11"
+                           FontAttributes="Bold"/>
+
+                    <Grid ColumnSpacing="12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <VerticalStackLayout Grid.Column="0">
+                            <Label Text="Auto Save"
+                                   TextColor="#D4D4D4" FontSize="13"/>
+                            <Label Text="Automatically save files after a delay"
+                                   TextColor="#888888" FontSize="11"/>
+                        </VerticalStackLayout>
+
+                        <Switch Grid.Column="1"
+                                IsToggled="{Binding AutoSave, Mode=TwoWay}"
+                                OnColor="#0078D4"
+                                ThumbColor="#D4D4D4"/>
+                    </Grid>
+
+                    <Grid ColumnSpacing="12" IsVisible="{Binding AutoSave}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="80"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Label Grid.Column="0" Text="Auto Save Delay (ms)"
+                               TextColor="#D4D4D4" FontSize="13"
+                               VerticalOptions="Center"/>
+                        <Entry Grid.Column="1"
+                               Text="{Binding AutoSaveDelay, Mode=TwoWay}"
+                               Keyboard="Numeric"
+                               TextColor="#D4D4D4"
+                               BackgroundColor="#3C3C3C"
+                               FontSize="13"/>
+                    </Grid>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Action buttons -->
+            <HorizontalStackLayout HorizontalOptions="End" Spacing="8">
+                <Button Text="Reset Defaults"
+                        Command="{Binding ResetCommand}"
+                        BackgroundColor="#3C3C3C"
+                        TextColor="#D4D4D4"
+                        CornerRadius="4"
+                        FontSize="13"
+                        Padding="16,8"/>
+
+                <Button Text="Apply"
+                        Command="{Binding SaveCommand}"
+                        BackgroundColor="#0078D4"
+                        TextColor="White"
+                        CornerRadius="4"
+                        FontSize="13"
+                        Padding="16,8"/>
+            </HorizontalStackLayout>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentView>

@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="DroidIDE.App.Views.Layout.CommandPaletteView"
+             BackgroundColor="Transparent"
+             InputTransparent="False"
+             IsVisible="False"
+             x:Name="PaletteRoot">
+
+    <!-- Overlay backdrop -->
+    <Grid BackgroundColor="#80000000">
+        <Grid.GestureRecognizers>
+            <TapGestureRecognizer Tapped="OnBackdropTapped"/>
+        </Grid.GestureRecognizers>
+
+        <!-- Palette card -->
+        <Frame WidthRequest="500"
+               MaximumHeightRequest="400"
+               VerticalOptions="Start"
+               HorizontalOptions="Center"
+               Margin="0,80,0,0"
+               Padding="0"
+               CornerRadius="8"
+               BackgroundColor="#252526"
+               BorderColor="#3C3C3C"
+               HasShadow="True">
+
+            <Grid RowSpacing="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="44"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Search input -->
+                <Entry x:Name="SearchEntry"
+                       Grid.Row="0"
+                       Placeholder="Type a command..."
+                       PlaceholderColor="#888888"
+                       TextColor="#D4D4D4"
+                       BackgroundColor="#3C3C3C"
+                       FontSize="14"
+                       Margin="8,8,8,4"
+                       TextChanged="OnSearchTextChanged"/>
+
+                <!-- Command list -->
+                <CollectionView x:Name="CommandList"
+                                Grid.Row="1"
+                                MaximumHeightRequest="300"
+                                SelectionMode="Single"
+                                SelectionChanged="OnCommandSelected">
+
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Padding="12,8" ColumnSpacing="8">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <!-- Command name -->
+                                <Label Grid.Column="0"
+                                       Text="{Binding DisplayName}"
+                                       TextColor="#D4D4D4"
+                                       FontSize="13"
+                                       VerticalOptions="Center"/>
+
+                                <!-- Shortcut badge -->
+                                <Frame Grid.Column="1"
+                                       Padding="6,2"
+                                       CornerRadius="3"
+                                       BackgroundColor="#1E1E1E"
+                                       BorderColor="#3C3C3C"
+                                       IsVisible="{Binding Shortcut, Converter={StaticResource IsNotNullConverter}}">
+                                    <Label Text="{Binding Shortcut}"
+                                           TextColor="#888888"
+                                           FontSize="11"/>
+                                </Frame>
+                            </Grid>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+
+                    <CollectionView.EmptyView>
+                        <Label Text="No commands found"
+                               TextColor="#888888"
+                               FontSize="12"
+                               Padding="12,16"
+                               HorizontalOptions="Center"/>
+                    </CollectionView.EmptyView>
+                </CollectionView>
+            </Grid>
+        </Frame>
+    </Grid>
+</ContentView>
