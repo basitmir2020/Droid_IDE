@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="DroidIDE.App.Views.Layout.EditorTabsView" BackgroundColor="#1E1E1E">
+    <HorizontalStackLayout>
+
+        <Frame BackgroundColor="#1E1E1E"
+               Padding="10,6"
+               HasShadow="False">
+
+            <Label Text="Program.cs"
+                   TextColor="#FFFFFF"/>
+        </Frame>
+
+        <Frame BackgroundColor="#2D2D30"
+               Padding="10,6"
+               HasShadow="False">
+
+            <Label Text="Startup.cs"
+                   TextColor="#AAAAAA"/>
+        </Frame>
+
+    </HorizontalStackLayout>
+</ContentPage>

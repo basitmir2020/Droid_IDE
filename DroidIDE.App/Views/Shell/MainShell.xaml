@@ -1,0 +1,48 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:layout="clr-namespace:DroidIDE.App.Views.Layout"
+             x:Class="DroidIDE.App.Views.Shell.MainShell"  BackgroundColor="#1E1E1E">
+    <Grid ColumnSpacing="0" RowSpacing="0">
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="48"/>
+            <ColumnDefinition x:Name="ExplorerColumn" Width="260"/>
+            <ColumnDefinition Width="6"/>   <!-- Vertical Splitter -->
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <layout:ActivityBarView Grid.Column="0"/>
+        <layout:ExplorerView Grid.Column="1"/>
+
+        <!-- Vertical Splitter -->
+        <BoxView x:Name="VerticalSplitter"
+                 Grid.Column="2"
+                 WidthRequest="6"
+                 BackgroundColor="#444444"/>
+
+        <!-- Editor Area -->
+        <Grid Grid.Column="3">
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="40"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="6"/>  <!-- Horizontal Splitter -->
+                <RowDefinition x:Name="BottomRow" Height="220"/>
+            </Grid.RowDefinitions>
+
+            <layout:EditorTabsView Grid.Row="0"/>
+            <layout:EditorHostView Grid.Row="1"/>
+
+            <!-- Horizontal Splitter -->
+            <BoxView x:Name="HorizontalSplitter"
+                     Grid.Row="2"
+                     HeightRequest="6"
+                     BackgroundColor="#444444"/>
+
+            <layout:BottomPanelView Grid.Row="3"/>
+
+        </Grid>
+    </Grid>
+</ContentPage>

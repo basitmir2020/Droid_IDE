@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="DroidIDE.App.Views.Layout.ActivityBarView" BackgroundColor="#1E1E1E">
+    <VerticalStackLayout
+        Spacing="20"
+        Padding="0,20"
+        HorizontalOptions="Center">
+
+        <ImageButton Source="explorer.png"
+                     WidthRequest="24"
+                     HeightRequest="24"
+                     BackgroundColor="Transparent"/>
+
+        <ImageButton Source="search.png"
+                     WidthRequest="24"
+                     HeightRequest="24"
+                     BackgroundColor="Transparent"/>
+
+        <ImageButton Source="git.png"
+                     WidthRequest="24"
+                     HeightRequest="24"
+                     BackgroundColor="Transparent"/>
+
+        <ImageButton Source="debug.png"
+                     WidthRequest="24"
+                     HeightRequest="24"
+                     BackgroundColor="Transparent"/>
+
+    </VerticalStackLayout>
+</ContentPage>

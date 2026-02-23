@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="DroidIDE.App.Views.Layout.ExplorerView" BackgroundColor="#1E1E1E">
+    <VerticalStackLayout>
+
+        <Label Text="EXPLORER"
+               TextColor="#CCCCCC"
+               FontSize="12"
+               Padding="12,8"/>
+
+        <CollectionView>
+            <CollectionView.ItemsSource>
+                <x:Array Type="{x:Type x:String}">
+                    <x:String>Program.cs</x:String>
+                    <x:String>Startup.cs</x:String>
+                    <x:String>appsettings.json</x:String>
+                </x:Array>
+            </CollectionView.ItemsSource>
+
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Label Text="{Binding}"
+                           TextColor="#D4D4D4"
+                           Padding="20,6"/>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+
+        </CollectionView>
+
+    </VerticalStackLayout>
+</ContentPage>

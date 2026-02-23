@@ -1,0 +1,10 @@
+<Solution>
+  <Project Path="DroidIDE.App/DroidIDE.App.csproj" />
+  <Project Path="DroidIDE.Core/DroidIDE.Core.csproj" />
+  <Project Path="DroidIDE.Editor/DroidIDE.Editor.csproj" />
+  <Project Path="DroidIDE.Git/DroidIDE.Git.csproj" />
+  <Project Path="DroidIDE.Infrastructure/DroidIDE.Infrastructure.csproj" />
+  <Project Path="DroidIDE.ProjectSystem/DroidIDE.ProjectSystem.csproj" />
+  <Project Path="DroidIDE.Runtime/DroidIDE.Runtime.csproj" />
+  <Project Path="DroidIDE.Terminal/DroidIDE.Terminal.csproj" />
+</Solution>
