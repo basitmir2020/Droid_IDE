@@ -5,13 +5,23 @@ using DroidIDE.Core.Models;
 namespace DroidIDE.ProjectSystem.ProjectParser;
 
 /// <summary>
-/// Parses .csproj XML files to extract project metadata, references, and configuration.
+/// Implements <see cref="IProjectParser"/> by parsing .csproj XML files using <see cref="XDocument"/>.
+/// Extracts project metadata, target framework, output type, namespace, package references, and project references.
 /// </summary>
 public class ProjectParser : IProjectParser
 {
     /// <summary>
-    /// Parse a .csproj file and return project metadata.
+    /// Parses a .csproj file and returns structured project metadata.
     /// </summary>
+    /// <param name="csprojPath">The absolute path to the .csproj file.</param>
+    /// <returns>A <see cref="ProjectInfo"/> containing the project's metadata, references, and configuration.</returns>
+    /// <exception cref="FileNotFoundException">Thrown when the specified .csproj file does not exist.</exception>
+    /// <exception cref="InvalidOperationException">Thrown when the XML root element is missing or invalid.</exception>
+    /// <remarks>
+    /// Reads the Sdk attribute from the root <c>&lt;Project&gt;</c> element, iterates all
+    /// <c>&lt;PropertyGroup&gt;</c> blocks for configuration, and collects both
+    /// <c>&lt;PackageReference&gt;</c> and <c>&lt;ProjectReference&gt;</c> items.
+    /// </remarks>
     public async Task<ProjectInfo> ParseAsync(string csprojPath)
     {
         if (!File.Exists(csprojPath))
@@ -80,8 +90,11 @@ public class ProjectParser : IProjectParser
     }
 
     /// <summary>
-    /// Get all package references from a .csproj file.
+    /// Extracts all NuGet package references from a .csproj file.
     /// </summary>
+    /// <param name="csprojPath">The absolute path to the .csproj file.</param>
+    /// <returns>A list of <see cref="PackageReference"/> with package names and versions.</returns>
+    /// <remarks>Delegates to <see cref="ParseAsync"/> and returns the <see cref="ProjectInfo.PackageReferences"/>.</remarks>
     public async Task<List<PackageReference>> GetPackageReferencesAsync(string csprojPath)
     {
         var project = await ParseAsync(csprojPath);

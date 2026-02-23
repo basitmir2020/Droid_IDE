@@ -5,21 +5,34 @@ using DroidIDE.Core.Models;
 namespace DroidIDE.ProjectSystem.SolutionParser;
 
 /// <summary>
-/// Parses .sln and .slnx solution files to extract project references.
+/// Implements <see cref="ISolutionParser"/> by parsing .sln and .slnx solution files
+/// to extract project references. Uses source-generated regex for both the classic
+/// <c>.sln</c> format and the XML-based <c>.slnx</c> format.
 /// </summary>
 public partial class SolutionParser : ISolutionParser
 {
     private readonly IProjectParser _projectParser;
 
+    /// <summary>
+    /// Initializes a new instance of <see cref="SolutionParser"/>.
+    /// </summary>
+    /// <param name="projectParser">The project parser used to parse each referenced .csproj file.</param>
     public SolutionParser(IProjectParser projectParser)
     {
         _projectParser = projectParser;
     }
 
     /// <summary>
-    /// Parse a solution file and return solution metadata with project list.
-    /// Supports both classic .sln format and XML-based .slnx format.
+    /// Parses a solution file and returns solution metadata with its list of projects.
+    /// Supports both classic <c>.sln</c> format and XML-based <c>.slnx</c> format.
     /// </summary>
+    /// <param name="solutionPath">The absolute path to the .sln or .slnx file.</param>
+    /// <returns>A <see cref="SolutionInfo"/> containing the solution metadata and parsed projects.</returns>
+    /// <exception cref="FileNotFoundException">Thrown when the solution file does not exist.</exception>
+    /// <remarks>
+    /// Unparseable projects are silently skipped to avoid crashing the entire solution load.
+    /// Only <c>.csproj</c> files are parsed; other project types are ignored.
+    /// </remarks>
     public async Task<SolutionInfo> ParseAsync(string solutionPath)
     {
         if (!File.Exists(solutionPath))
@@ -63,8 +76,10 @@ public partial class SolutionParser : ISolutionParser
     }
 
     /// <summary>
-    /// Detect if a file is a solution file (.sln or .slnx).
+    /// Determines whether a file is a solution file based on its extension.
     /// </summary>
+    /// <param name="filePath">The file path to check.</param>
+    /// <returns><c>true</c> if the file has a <c>.sln</c> or <c>.slnx</c> extension; otherwise, <c>false</c>.</returns>
     public bool IsSolutionFile(string filePath)
     {
         var ext = Path.GetExtension(filePath).ToLowerInvariant();
@@ -72,8 +87,10 @@ public partial class SolutionParser : ISolutionParser
     }
 
     /// <summary>
-    /// Parse classic .sln format using regex to extract Project() lines.
+    /// Parses a classic <c>.sln</c> file using regex to extract <c>Project()</c> declarations.
     /// </summary>
+    /// <param name="solutionPath">The absolute path to the .sln file.</param>
+    /// <returns>A list of relative project file paths referenced in the solution.</returns>
     private async Task<List<string>> ParseSlnAsync(string solutionPath)
     {
         var content = await File.ReadAllTextAsync(solutionPath);
@@ -94,8 +111,10 @@ public partial class SolutionParser : ISolutionParser
     }
 
     /// <summary>
-    /// Parse .slnx XML format.
+    /// Parses a <c>.slnx</c> XML-format solution file using regex to extract <c>&lt;Project&gt;</c> elements.
     /// </summary>
+    /// <param name="solutionPath">The absolute path to the .slnx file.</param>
+    /// <returns>A list of relative project file paths referenced in the solution.</returns>
     private async Task<List<string>> ParseSlnxAsync(string solutionPath)
     {
         var content = await File.ReadAllTextAsync(solutionPath);
@@ -114,11 +133,17 @@ public partial class SolutionParser : ISolutionParser
         return projectPaths;
     }
 
-    // Classic .sln format: Project("{...}") = "Name", "Path\To\Project.csproj", "{...}"
+    /// <summary>
+    /// Source-generated regex matching classic .sln Project() declarations.
+    /// Captures the relative project path from: <c>Project("{GUID}") = "Name", "Path\To\Project.csproj", "{GUID}"</c>.
+    /// </summary>
     [GeneratedRegex(@"Project\(""\{[^}]+\}""\)\s*=\s*""[^""]*"",\s*""([^""]+)""", RegexOptions.Compiled)]
     private static partial Regex SlnProjectRegex();
 
-    // .slnx XML format: <Project Path="..." />
+    /// <summary>
+    /// Source-generated regex matching .slnx XML Project elements.
+    /// Captures the path attribute from: <c>&lt;Project Path="..." /&gt;</c>.
+    /// </summary>
     [GeneratedRegex(@"<Project\s+Path=""([^""]+)""", RegexOptions.Compiled | RegexOptions.IgnoreCase)]
     private static partial Regex SlnxProjectRegex();
 }

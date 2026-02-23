@@ -7,12 +7,19 @@ using DroidIDE.Terminal.OutputParser;
 namespace DroidIDE.Runtime.DotnetManager;
 
 /// <summary>
-/// Wraps all dotnet CLI operations, providing typed access to build, run, test, etc.
+/// Implements <see cref="IDotnetCli"/> by wrapping all dotnet CLI operations.
+/// Provides typed access to build, run, test, clean, restore, and SDK version commands.
+/// Uses <see cref="IProcessManager"/> for process execution and <see cref="OutputLineParser"/>
+/// for extracting structured diagnostics from build output.
 /// </summary>
 public class DotnetCliService : IDotnetCli
 {
     private readonly IProcessManager _processManager;
 
+    /// <summary>
+    /// Initializes a new instance of <see cref="DotnetCliService"/>.
+    /// </summary>
+    /// <param name="processManager">The process manager used for executing dotnet CLI commands.</param>
     public DotnetCliService(IProcessManager processManager)
     {
         _processManager = processManager;
@@ -22,6 +29,11 @@ public class DotnetCliService : IDotnetCli
     public event Action<string>? BuildOutputReceived;
 
     /// <inheritdoc/>
+    /// <remarks>
+    /// Starts a streaming <c>dotnet build --no-restore</c> process, captures each output line,
+    /// parses MSBuild diagnostics via <see cref="OutputLineParser.TryParseDiagnostic"/>,
+    /// and waits for the process to exit before returning a structured <see cref="BuildResult"/>.
+    /// </remarks>
     public async Task<BuildResult> BuildAsync(string projectPath, CancellationToken cancellationToken = default)
     {
         var stopwatch = Stopwatch.StartNew();
@@ -116,6 +128,10 @@ public class DotnetCliService : IDotnetCli
     }
 
     /// <inheritdoc/>
+    /// <remarks>
+    /// Runs <c>dotnet --version</c> and considers the SDK available if the command succeeds
+    /// and produces non-empty output. Returns <c>false</c> on any exception (e.g., dotnet not found).
+    /// </remarks>
     public async Task<bool> IsAvailableAsync()
     {
         try

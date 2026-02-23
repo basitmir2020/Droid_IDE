@@ -11,12 +11,23 @@ namespace DroidIDE.Editor.Refactoring;
 /// <summary>
 /// Provides Roslyn-powered code refactoring actions such as
 /// Rename, Extract Method, Add Using, and Generate Constructor.
+/// Creates temporary <see cref="AdhocWorkspace"/> instances for each operation.
 /// </summary>
 public class RefactoringService
 {
     /// <summary>
-    /// Get available code actions at a given position in the source.
+    /// Analyzes the source code at a given position and returns available code actions
+    /// such as rename suggestions and missing-using quick fixes.
     /// </summary>
+    /// <param name="content">The full C# source code to analyze.</param>
+    /// <param name="position">The 0-based character offset in the source where the cursor is located.</param>
+    /// <param name="filePath">Optional file path for context (used in document metadata).</param>
+    /// <returns>A list of <see cref="CodeActionInfo"/> describing available refactoring actions.</returns>
+    /// <remarks>
+    /// Creates a disposable workspace, adds the source as a document, analyzes the syntax tree
+    /// and semantic model at the cursor position, and suggests applicable refactorings.
+    /// Silently handles analysis failures to avoid crashing the editor.
+    /// </remarks>
     public async Task<List<CodeActionInfo>> GetCodeActionsAsync(string content, int position, string filePath = "")
     {
         var results = new List<CodeActionInfo>();
@@ -118,9 +129,15 @@ public class RefactoringService
     }
 
     /// <summary>
-    /// Apply a rename refactoring to the source code.
-    /// Returns the modified content.
+    /// Applies a rename refactoring to the symbol at the given position in the source code.
     /// </summary>
+    /// <param name="content">The full C# source code.</param>
+    /// <param name="position">The 0-based character offset of the symbol to rename.</param>
+    /// <param name="newName">The new name to give to the symbol.</param>
+    /// <returns>
+    /// The modified source code with all references renamed, or <c>null</c> if the rename could not be applied
+    /// (e.g., no symbol found at the position).
+    /// </returns>
     public async Task<string?> RenameSymbolAsync(string content, int position, string newName)
     {
         var workspace = new AdhocWorkspace(MefHostServices.DefaultHost);
@@ -178,11 +195,16 @@ public class RefactoringService
 }
 
 /// <summary>
-/// Information about an available code action / refactoring.
+/// Describes an available code action or refactoring suggestion at a cursor position.
 /// </summary>
 public class CodeActionInfo
 {
+    /// <summary>Gets or sets the human-readable title of the code action (e.g., "Rename 'MyMethod'").</summary>
     public string Title { get; set; } = string.Empty;
+
+    /// <summary>Gets or sets the code action kind identifier (e.g., "refactor.rename", "quickfix.addusing").</summary>
     public string Kind { get; set; } = string.Empty;
+
+    /// <summary>Gets or sets an optional detailed description of what the code action does.</summary>
     public string? Description { get; set; }
 }

@@ -5,7 +5,9 @@ using LibGit2Sharp;
 namespace DroidIDE.Git.GitService;
 
 /// <summary>
-/// Implements IGitService using LibGit2Sharp for all Git operations.
+/// Implements <see cref="IGitService"/> using LibGit2Sharp for all Git operations.
+/// Provides repository initialization, cloning, staging, committing, pushing, pulling,
+/// status queries, and branch management — all running on background threads via <see cref="Task.Run"/>.
 /// </summary>
 public class GitService : IGitService
 {
@@ -16,6 +18,10 @@ public class GitService : IGitService
     }
 
     /// <inheritdoc/>
+    /// <remarks>
+    /// Reports clone progress via the optional <paramref name="progress"/> callback
+    /// using the LibGit2Sharp transfer progress handler.
+    /// </remarks>
     public Task CloneAsync(string url, string targetPath, IProgress<string>? progress = null)
     {
         return Task.Run(() =>
@@ -36,6 +42,9 @@ public class GitService : IGitService
     }
 
     /// <inheritdoc/>
+    /// <remarks>
+    /// Converts absolute file paths to repository-relative paths before staging.
+    /// </remarks>
     public Task StageAsync(string repoPath, IEnumerable<string> filePaths)
     {
         return Task.Run(() =>
@@ -61,6 +70,9 @@ public class GitService : IGitService
     }
 
     /// <inheritdoc/>
+    /// <remarks>
+    /// Uses the same <see cref="Signature"/> for both author and committer fields.
+    /// </remarks>
     public Task CommitAsync(string repoPath, string message, string authorName, string authorEmail)
     {
         return Task.Run(() =>
@@ -72,6 +84,9 @@ public class GitService : IGitService
     }
 
     /// <inheritdoc/>
+    /// <exception cref="InvalidOperationException">
+    /// Thrown when the specified remote or branch is not found in the repository.
+    /// </exception>
     public Task PushAsync(string repoPath, string remoteName = "origin", string branchName = "main")
     {
         return Task.Run(() =>
@@ -90,6 +105,9 @@ public class GitService : IGitService
     }
 
     /// <inheritdoc/>
+    /// <remarks>
+    /// Builds the commit signature from the repository's git config (user.name and user.email).
+    /// </remarks>
     public Task PullAsync(string repoPath, string remoteName = "origin")
     {
         return Task.Run(() =>
@@ -107,6 +125,10 @@ public class GitService : IGitService
     }
 
     /// <inheritdoc/>
+    /// <remarks>
+    /// Only returns files with a non-unmodified status. Unmodified files are excluded
+    /// from the result dictionary to keep the output compact.
+    /// </remarks>
     public Task<Dictionary<string, GitFileStatus>> GetStatusAsync(string repoPath)
     {
         return Task.Run(() =>
@@ -128,6 +150,7 @@ public class GitService : IGitService
     }
 
     /// <inheritdoc/>
+    /// <remarks>Returns only local branches; remote tracking branches are excluded.</remarks>
     public Task<List<string>> GetBranchesAsync(string repoPath)
     {
         return Task.Run(() =>
@@ -151,6 +174,7 @@ public class GitService : IGitService
     }
 
     /// <inheritdoc/>
+    /// <exception cref="InvalidOperationException">Thrown when the specified branch is not found.</exception>
     public Task CheckoutAsync(string repoPath, string branchName)
     {
         return Task.Run(() =>
@@ -179,8 +203,11 @@ public class GitService : IGitService
     }
 
     /// <summary>
-    /// Map LibGit2Sharp FileStatus to our Core GitFileStatus enum.
+    /// Maps LibGit2Sharp's <see cref="FileStatus"/> flags to the DroidIDE Core
+    /// <see cref="GitFileStatus"/> enum for UI display.
     /// </summary>
+    /// <param name="status">The LibGit2Sharp file status flags.</param>
+    /// <returns>The corresponding <see cref="GitFileStatus"/> value.</returns>
     private static GitFileStatus MapStatus(FileStatus status)
     {
         if (status.HasFlag(FileStatus.Conflicted))

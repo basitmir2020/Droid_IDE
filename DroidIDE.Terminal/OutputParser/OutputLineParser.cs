@@ -5,19 +5,30 @@ using DroidIDE.Core.Models;
 namespace DroidIDE.Terminal.OutputParser;
 
 /// <summary>
-/// Parses compiler/build output lines into structured diagnostic items.
-/// Handles MSBuild-style error/warning messages.
+/// Parses compiler and build output lines into structured <see cref="DiagnosticItem"/> objects.
+/// Handles the MSBuild diagnostic format: <c>filepath(line,col): error/warning CODE: message</c>.
+/// Uses source-generated regex via <see cref="GeneratedRegexAttribute"/> for compile-time optimization.
 /// </summary>
 public static partial class OutputLineParser
 {
-    // Matches MSBuild diagnostic format: filepath(line,col): error/warning CODE: message
+    /// <summary>
+    /// Source-generated regex matching the MSBuild diagnostic output format.
+    /// Captures: filepath, line, column, severity (error/warning), code, and message.
+    /// </summary>
     [GeneratedRegex(@"^(.+?)\((\d+),(\d+)\):\s+(error|warning)\s+(\w+):\s+(.+)$")]
     private static partial Regex MsBuildDiagnosticRegex();
 
     /// <summary>
-    /// Attempts to parse a build output line into a DiagnosticItem.
-    /// Returns null if the line is not a diagnostic.
+    /// Attempts to parse a single build output line into a structured <see cref="DiagnosticItem"/>.
     /// </summary>
+    /// <param name="line">A raw build output line from MSBuild or the dotnet CLI.</param>
+    /// <returns>
+    /// A <see cref="DiagnosticItem"/> if the line matches the MSBuild diagnostic format;
+    /// otherwise, <c>null</c> for non-diagnostic lines.
+    /// </returns>
+    /// <remarks>
+    /// ANSI escape codes are automatically stripped before pattern matching via <see cref="AnsiParser.StripAnsi"/>.
+    /// </remarks>
     public static DiagnosticItem? TryParseDiagnostic(string line)
     {
         if (string.IsNullOrWhiteSpace(line))
@@ -44,8 +55,10 @@ public static partial class OutputLineParser
     }
 
     /// <summary>
-    /// Parses multiple output lines, returning only those that are diagnostics.
+    /// Parses multiple build output lines and returns only those that are valid diagnostics.
     /// </summary>
+    /// <param name="lines">A collection of raw build output lines.</param>
+    /// <returns>A list of <see cref="DiagnosticItem"/> objects parsed from the diagnostic lines.</returns>
     public static List<DiagnosticItem> ParseDiagnostics(IEnumerable<string> lines)
     {
         return lines
