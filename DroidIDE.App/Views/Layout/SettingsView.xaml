@@ -17,8 +17,8 @@
                    FontAttributes="Bold"/>
 
             <!-- ── Appearance Section ── -->
-            <Frame BackgroundColor="#252526" BorderColor="#3C3C3C"
-                   CornerRadius="8" Padding="16">
+            <Border BackgroundColor="#252526" Stroke="#3C3C3C"
+                   StrokeShape="RoundRectangle 8" Padding="16">
                 <VerticalStackLayout Spacing="12">
 
                     <Label Text="APPEARANCE"
@@ -53,11 +53,11 @@
                         </Picker>
                     </Grid>
                 </VerticalStackLayout>
-            </Frame>
+            </Border>
 
             <!-- ── Editor Section ── -->
-            <Frame BackgroundColor="#252526" BorderColor="#3C3C3C"
-                   CornerRadius="8" Padding="16">
+            <Border BackgroundColor="#252526" Stroke="#3C3C3C"
+                   StrokeShape="RoundRectangle 8" Padding="16">
                 <VerticalStackLayout Spacing="12">
 
                     <Label Text="EDITOR"
@@ -176,11 +176,11 @@
                                 ThumbColor="#D4D4D4"/>
                     </Grid>
                 </VerticalStackLayout>
-            </Frame>
+            </Border>
 
             <!-- ── Auto Save Section ── -->
-            <Frame BackgroundColor="#252526" BorderColor="#3C3C3C"
-                   CornerRadius="8" Padding="16">
+            <Border BackgroundColor="#252526" Stroke="#3C3C3C"
+                   StrokeShape="RoundRectangle 8" Padding="16">
                 <VerticalStackLayout Spacing="12">
 
                     <Label Text="AUTO SAVE"
@@ -224,7 +224,7 @@
                                FontSize="13"/>
                     </Grid>
                 </VerticalStackLayout>
-            </Frame>
+            </Border>
 
             <!-- Action buttons -->
             <HorizontalStackLayout HorizontalOptions="End" Spacing="8">

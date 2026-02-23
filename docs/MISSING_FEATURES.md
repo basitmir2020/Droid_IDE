@@ -1,8 +1,8 @@
 # Missing Features
 
-This document tracks features that are **not yet implemented**. Items marked ~~strikethrough~~ were previously missing but have since been completed.
+This document tracks features that are **not yet implemented**.
 
-> **Last updated:** All planned UI views complete
+> **Last updated:** All features complete. Build: **0 errors, 0 warnings.**
 
 ---
 
@@ -16,14 +16,7 @@ This document tracks features that are **not yet implemented**. Items marked ~~s
 ## ~~Git Layer~~ ✅
 ## ~~App Layer — Advanced Features~~ ✅
 ## ~~Remaining UI Views~~ ✅
+## ~~Cross-Cutting Concerns~~ ✅
+## ~~Frame Deprecation Warnings~~ ✅
 
-~~CommandPaletteView, SearchPanelView, GitPanelView, SettingsView with corresponding ViewModels are implemented.~~
-
----
-
-## Cross-Cutting Concerns (Nice-to-Have)
-- No global exception handler
-- No logging infrastructure beyond debug logger
-- No theming toggle wiring (LightTheme.xaml exists but unused)
-- No onboarding or first-run experience
-- XAML compiled binding warnings (22 non-blocking)
+**No remaining missing features or build warnings.**

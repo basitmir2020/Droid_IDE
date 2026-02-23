@@ -3,13 +3,14 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:local="clr-namespace:DroidIDE.App"
              xmlns:converters="clr-namespace:DroidIDE.App.Converters"
+             xmlns:themes="clr-namespace:DroidIDE.App.Resources.Themes"
              x:Class="DroidIDE.App.App">
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Resources/Styles/Colors.xaml" />
                 <ResourceDictionary Source="Resources/Styles/Styles.xaml" />
-                <ResourceDictionary Source="Resources/Themes/DarkTheme.xaml" />
+                <themes:DarkTheme />
             </ResourceDictionary.MergedDictionaries>
 
             <!-- Value Converters -->
@@ -19,6 +20,7 @@
             <converters:BoolToModifiedDotConverter x:Key="BoolToModifiedDotConverter"/>
             <converters:IsNotNullConverter x:Key="IsNotNullConverter"/>
             <converters:IsNullConverter x:Key="IsNullConverter"/>
+            <converters:InverseBoolConverter x:Key="InverseBoolConverter"/>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

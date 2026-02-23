@@ -62,6 +62,11 @@ public static class MauiProgram
         builder.Services.AddSingleton<BranchManager>();
         builder.Services.AddSingleton<RepositoryManager>();
 
+        // ── Cross-Cutting Services ──
+        builder.Services.AddSingleton<AppLogger>();
+        builder.Services.AddSingleton<GlobalExceptionHandler>();
+        builder.Services.AddSingleton<ThemeService>();
+
         // ── App Services ──
         builder.Services.AddSingleton<IEditorService, EditorService>();
         builder.Services.AddSingleton<CommandPaletteService>();

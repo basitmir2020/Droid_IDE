@@ -48,7 +48,7 @@
             </Border>
 
             <!-- Spacer -->
-            <BoxView HorizontalOptions="FillAndExpand"
+            <BoxView HorizontalOptions="Fill"
                      Color="Transparent"/>
 
             <!-- New Terminal Button -->

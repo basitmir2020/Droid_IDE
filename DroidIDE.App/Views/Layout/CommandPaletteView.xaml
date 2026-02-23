@@ -15,16 +15,15 @@
         </Grid.GestureRecognizers>
 
         <!-- Palette card -->
-        <Frame WidthRequest="500"
+        <Border WidthRequest="500"
                MaximumHeightRequest="400"
                VerticalOptions="Start"
                HorizontalOptions="Center"
                Margin="0,80,0,0"
                Padding="0"
-               CornerRadius="8"
+               StrokeShape="RoundRectangle 8"
                BackgroundColor="#252526"
-               BorderColor="#3C3C3C"
-               HasShadow="True">
+               Stroke="#3C3C3C">
 
             <Grid RowSpacing="0">
                 <Grid.RowDefinitions>
@@ -66,16 +65,16 @@
                                        VerticalOptions="Center"/>
 
                                 <!-- Shortcut badge -->
-                                <Frame Grid.Column="1"
+                                <Border Grid.Column="1"
                                        Padding="6,2"
-                                       CornerRadius="3"
+                                       StrokeShape="RoundRectangle 3"
                                        BackgroundColor="#1E1E1E"
-                                       BorderColor="#3C3C3C"
+                                       Stroke="#3C3C3C"
                                        IsVisible="{Binding Shortcut, Converter={StaticResource IsNotNullConverter}}">
                                     <Label Text="{Binding Shortcut}"
                                            TextColor="#888888"
                                            FontSize="11"/>
-                                </Frame>
+                                </Border>
                             </Grid>
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
@@ -89,6 +88,6 @@
                     </CollectionView.EmptyView>
                 </CollectionView>
             </Grid>
-        </Frame>
+        </Border>
     </Grid>
 </ContentView>

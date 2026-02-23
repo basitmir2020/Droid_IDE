@@ -45,11 +45,11 @@
                        ReturnCommand="{Binding SearchCommand}"/>
 
                 <!-- Case sensitivity toggle -->
-                <Frame Grid.Column="1"
+                <Border Grid.Column="1"
                        Padding="4"
-                       CornerRadius="4"
+                       StrokeShape="RoundRectangle 4"
                        BackgroundColor="#3C3C3C"
-                       BorderColor="#3C3C3C"
+                       Stroke="#3C3C3C"
                        x:Name="CaseToggle">
                     <Label Text="Aa"
                            TextColor="#D4D4D4"
@@ -60,7 +60,7 @@
                             <TapGestureRecognizer Tapped="OnCaseToggleTapped"/>
                         </Label.GestureRecognizers>
                     </Label>
-                </Frame>
+                </Border>
             </Grid>
 
             <!-- File filter -->

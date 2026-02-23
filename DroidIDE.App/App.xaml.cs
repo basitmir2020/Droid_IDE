@@ -1,4 +1,5 @@
-﻿using DroidIDE.App.Views.Shell;
+﻿using DroidIDE.App.Services;
+using DroidIDE.App.Views.Shell;
 
 namespace DroidIDE.App;
 
@@ -10,6 +11,18 @@ public partial class App : Application
     {
         _serviceProvider = serviceProvider;
         InitializeComponent();
+
+        // Register global exception handler
+        var exceptionHandler = _serviceProvider.GetRequiredService<GlobalExceptionHandler>();
+        exceptionHandler.Register();
+
+        // Apply saved theme
+        var themeService = _serviceProvider.GetRequiredService<ThemeService>();
+        themeService.ApplySavedTheme();
+
+        // Log startup
+        var logger = _serviceProvider.GetRequiredService<AppLogger>();
+        logger.LogInfo("DroidIDE application started.");
     }
 
     protected override Window CreateWindow(IActivationState? activationState)
