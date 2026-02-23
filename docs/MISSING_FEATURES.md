@@ -2,7 +2,7 @@
 
 This document tracks features that are **not yet implemented**. Items marked ~~strikethrough~~ were previously missing but have since been completed.
 
-> **Last updated:** Phase 1 complete
+> **Last updated:** Phase 2 complete
 
 ---
 
@@ -18,6 +18,12 @@ This document tracks features that are **not yet implemented**. Items marked ~~s
 ## ~~App Layer — Foundation~~ ✅
 ~~DI registration, ViewModels, EditorService, value converters, and data-bound views are implemented.~~
 
+## ~~Project System Layer~~ ✅
+~~SolutionParser (.sln/.slnx), ProjectParser (.csproj), and NuGetManager are implemented.~~
+
+## ~~Runtime Layer~~ ✅
+~~DotnetCliService (IDotnetCli), BuildService, RunService, and ServiceManager are implemented.~~
+
 ---
 
 ## Editor Layer (Phase 3)
@@ -26,17 +32,6 @@ This document tracks features that are **not yet implemented**. Items marked ~~s
 - No diagnostics/error reporting (Diagnostics folder is empty)
 - No refactoring support (Refactoring folder is empty)
 - EditorHostView uses native MAUI Editor control instead of Monaco WebView
-
-## Runtime Layer (Phase 2)
-- No dotnet CLI wrapper (DotnetManager folder is empty)
-- No build command execution (Build folder is empty)
-- No run/debug command execution (Run folder is empty)
-- No microservice process tracking (ServiceManager folder is empty)
-
-## Project System Layer (Phase 2)
-- No .sln file parser (SolutionParser folder is empty)
-- No .csproj file parser (ProjectParser folder is empty)
-- No NuGet package manager (NuGetManager folder is empty)
 
 ## Git Layer (Phase 4)
 - No GitService implementation (GitService folder is empty)

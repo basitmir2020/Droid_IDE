@@ -7,12 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="NuGetManager\" />
-    <Folder Include="ProjectParser\" />
-    <Folder Include="SolutionParser\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\DroidIDE.Core\DroidIDE.Core.csproj" />
   </ItemGroup>
 

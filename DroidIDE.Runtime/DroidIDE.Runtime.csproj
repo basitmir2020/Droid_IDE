@@ -7,14 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Build\" />
-    <Folder Include="DotnetManager\" />
-    <Folder Include="Run\" />
-    <Folder Include="ServiceManager\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\DroidIDE.Core\DroidIDE.Core.csproj" />
+    <ProjectReference Include="..\DroidIDE.Terminal\DroidIDE.Terminal.csproj" />
   </ItemGroup>
 
 </Project>

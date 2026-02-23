@@ -1,27 +1,21 @@
 ﻿  Determining projects to restore...
-  All projects are up-to-date for restore.
+  Restored C:\Users\basit\Desktop\DroidIDE\DroidIDE.Runtime\DroidIDE.Runtime.csproj (in 609 ms).
+  Restored C:\Users\basit\Desktop\DroidIDE\DroidIDE.App\DroidIDE.App.csproj (in 4.56 sec).
+  6 of 8 projects are up-to-date for restore.
   DroidIDE.Core -> C:\Users\basit\Desktop\DroidIDE\DroidIDE.Core\bin\Debug\net10.0\DroidIDE.Core.dll
-  DroidIDE.Git -> C:\Users\basit\Desktop\DroidIDE\DroidIDE.Git\bin\Debug\net10.0\DroidIDE.Git.dll
-  DroidIDE.ProjectSystem -> C:\Users\basit\Desktop\DroidIDE\DroidIDE.ProjectSystem\bin\Debug\net10.0\DroidIDE.ProjectSystem.dll
-  DroidIDE.Runtime -> C:\Users\basit\Desktop\DroidIDE\DroidIDE.Runtime\bin\Debug\net10.0\DroidIDE.Runtime.dll
   DroidIDE.Infrastructure -> C:\Users\basit\Desktop\DroidIDE\DroidIDE.Infrastructure\bin\Debug\net10.0\DroidIDE.Infrastructure.dll
-  DroidIDE.Editor -> C:\Users\basit\Desktop\DroidIDE\DroidIDE.Editor\bin\Debug\net10.0\DroidIDE.Editor.dll
-  DroidIDE.Terminal -> C:\Users\basit\Desktop\DroidIDE\DroidIDE.Terminal\bin\Debug\net10.0\DroidIDE.Terminal.dll
-  XAML source generation is enabled (MauiXamlInflator=SourceGen). This generates C# code from XAML at compile time for better performance. To disable, remove the MauiXamlInflator line from your .csproj file (reverts to configuration-based defaults: Runtime in Debug, XamlC in Release).
-C:\Users\basit\Desktop\DroidIDE\DroidIDE.App\obj\Debug\net10.0-android\Microsoft.Maui.Controls.SourceGen\Microsoft.Maui.Controls.SourceGen.XamlGenerator\Views_Layout_BottomPanelView.xaml.xsg.cs(198,84): warning CS0618: 'LayoutOptions.FillAndExpand' is obsolete: 'The StackLayout expansion options are deprecated; please use a Grid instead.' [C:\Users\basit\Desktop\DroidIDE\DroidIDE.App\DroidIDE.App.csproj::TargetFramework=net10.0-android]
-  DroidIDE.App -> C:\Users\basit\Desktop\DroidIDE\DroidIDE.App\bin\Debug\net10.0-android\DroidIDE.App.dll
-  DroidIDE.Core -> C:\Users\basit\Desktop\DroidIDE\DroidIDE.Core\bin\Debug\net10.0\DroidIDE.Core.dll
   DroidIDE.Git -> C:\Users\basit\Desktop\DroidIDE\DroidIDE.Git\bin\Debug\net10.0\DroidIDE.Git.dll
-  DroidIDE.ProjectSystem -> C:\Users\basit\Desktop\DroidIDE\DroidIDE.ProjectSystem\bin\Debug\net10.0\DroidIDE.ProjectSystem.dll
   DroidIDE.Editor -> C:\Users\basit\Desktop\DroidIDE\DroidIDE.Editor\bin\Debug\net10.0\DroidIDE.Editor.dll
+  DroidIDE.ProjectSystem -> C:\Users\basit\Desktop\DroidIDE\DroidIDE.ProjectSystem\bin\Debug\net10.0\DroidIDE.ProjectSystem.dll
   DroidIDE.Terminal -> C:\Users\basit\Desktop\DroidIDE\DroidIDE.Terminal\bin\Debug\net10.0\DroidIDE.Terminal.dll
-  DroidIDE.Runtime -> C:\Users\basit\Desktop\DroidIDE\DroidIDE.Runtime\bin\Debug\net10.0\DroidIDE.Runtime.dll
-  DroidIDE.Infrastructure -> C:\Users\basit\Desktop\DroidIDE\DroidIDE.Infrastructure\bin\Debug\net10.0\DroidIDE.Infrastructure.dll
+C:\Users\basit\Desktop\DroidIDE\DroidIDE.Runtime\DotnetManager\DotnetCliService.cs(64,46): error CS0117: 'BuildStatus' does not contain a definition for 'Succeeded' [C:\Users\basit\Desktop\DroidIDE\DroidIDE.Runtime\DroidIDE.Runtime.csproj]
+C:\Users\basit\Desktop\DroidIDE\DroidIDE.Runtime\Build\BuildService.cs(49,52): error CS0117: 'BuildStatus' does not contain a definition for 'Succeeded' [C:\Users\basit\Desktop\DroidIDE\DroidIDE.Runtime\DroidIDE.Runtime.csproj]
 
-Build succeeded.
+Build FAILED.
 
-C:\Users\basit\Desktop\DroidIDE\DroidIDE.App\obj\Debug\net10.0-android\Microsoft.Maui.Controls.SourceGen\Microsoft.Maui.Controls.SourceGen.XamlGenerator\Views_Layout_BottomPanelView.xaml.xsg.cs(198,84): warning CS0618: 'LayoutOptions.FillAndExpand' is obsolete: 'The StackLayout expansion options are deprecated; please use a Grid instead.' [C:\Users\basit\Desktop\DroidIDE\DroidIDE.App\DroidIDE.App.csproj::TargetFramework=net10.0-android]
-    1 Warning(s)
-    0 Error(s)
+C:\Users\basit\Desktop\DroidIDE\DroidIDE.Runtime\DotnetManager\DotnetCliService.cs(64,46): error CS0117: 'BuildStatus' does not contain a definition for 'Succeeded' [C:\Users\basit\Desktop\DroidIDE\DroidIDE.Runtime\DroidIDE.Runtime.csproj]
+C:\Users\basit\Desktop\DroidIDE\DroidIDE.Runtime\Build\BuildService.cs(49,52): error CS0117: 'BuildStatus' does not contain a definition for 'Succeeded' [C:\Users\basit\Desktop\DroidIDE\DroidIDE.Runtime\DroidIDE.Runtime.csproj]
+    0 Warning(s)
+    2 Error(s)
 
-Time Elapsed 00:00:39.14
+Time Elapsed 00:00:57.95
