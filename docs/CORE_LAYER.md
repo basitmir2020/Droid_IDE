@@ -59,10 +59,10 @@ DroidIDE.Core/
 | `IProcessManager` | `ProcessManager` | Infrastructure |
 | `ITerminalService` | `ProcessSessionManager` | Terminal |
 | `IEditorService` | `EditorService` | App |
-| `IDotnetCli` | *(Phase 2)* | Runtime |
-| `IProjectParser` | *(Phase 2)* | ProjectSystem |
-| `ISolutionParser` | *(Phase 2)* | ProjectSystem |
-| `IGitService` | *(Phase 4)* | Git |
+| `IDotnetCli` | `DotnetCliService` | Runtime |
+| `IProjectParser` | `ProjectParser` | ProjectSystem |
+| `ISolutionParser` | `SolutionParser` | ProjectSystem |
+| `IGitService` | `GitService` | Git |
 
 ---
 

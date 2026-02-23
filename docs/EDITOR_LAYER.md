@@ -1,12 +1,12 @@
 ﻿# Editor Layer — `DroidIDE.Editor`
 
-> **Status:** 🔲 Planned for Phase 3
+> **Status:** ✅ Implemented
 
-The Editor layer will handle code intelligence — Monaco editor integration, Roslyn language services, diagnostics, and refactoring.
+The Editor layer handles code intelligence — Monaco editor integration, Roslyn language services, diagnostics, and refactoring.
 
 ---
 
-## Planned Structure
+## Directory Structure
 
 ```
 DroidIDE.Editor/
@@ -22,7 +22,7 @@ DroidIDE.Editor/
 
 ---
 
-## Planned Features
+## Features
 
 ### Monaco Integration
 - Load Monaco editor via embedded HTML/JS in a MAUI `WebView`
@@ -47,7 +47,7 @@ DroidIDE.Editor/
 
 ---
 
-## Dependencies (Planned)
+## Dependencies
 
 - `DroidIDE.Core`
 - `Microsoft.CodeAnalysis.CSharp` (Roslyn)
@@ -57,4 +57,4 @@ DroidIDE.Editor/
 
 ## Current State
 
-`MonacoEditorView.xaml` exists as an empty `ContentView` placeholder. The `EditorHostView` currently uses a native MAUI `Editor` control for basic text editing. In Phase 3, this will be replaced with a `WebView` hosting the Monaco editor.
+The `MonacoEditorBridge`, `RoslynLanguageService`, `DiagnosticService`, and `RefactoringService` classes are implemented. The `EditorHostView` in the App layer currently uses a native MAUI `Editor` control as the editing surface, with the Monaco WebView integration available via `MonacoEditorView`.

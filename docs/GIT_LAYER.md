@@ -1,12 +1,12 @@
 ﻿# Git Layer — `DroidIDE.Git`
 
-> **Status:** 🔲 Planned for Phase 4
+> **Status:** ✅ Implemented
 
 The Git layer provides version control integration using LibGit2Sharp, enabling clone, commit, push, pull, branching, and file status tracking entirely on-device.
 
 ---
 
-## Planned Structure
+## Directory Structure
 
 ```
 DroidIDE.Git/
@@ -20,7 +20,7 @@ DroidIDE.Git/
 
 ---
 
-## Planned Features
+## Features
 
 ### GitService (`IGitService`)
 
@@ -47,14 +47,15 @@ DroidIDE.Git/
 - Working directory state management
 - File status tracking per `GitFileStatus` enum (`Modified`, `Added`, `Deleted`, `Untracked`, `Renamed`)
 
-### App Layer Integration (Planned)
-- **GitPanelView** — changed files, staging area, commit message input
+### App Layer Integration
+- **GitPanelView** — changed files list, staging area, commit message input, branch info
+- **GitViewModel** — full MVVM data binding for Git operations
 - **ActivityBar** git button toggles the Git sidebar panel
-- **StatusBarView** displays current branch name (currently hardcoded as "main")
+- **StatusBarView** displays current branch name
 
 ---
 
-## Dependencies (Planned)
+## Dependencies
 
 - `DroidIDE.Core` (for `IGitService`, `GitFileStatus`)
 - `LibGit2Sharp` NuGet package

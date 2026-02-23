@@ -42,10 +42,11 @@ DroidIDE is composed of **8 projects** organized in a clean architecture. Each l
 ## DroidIDE.App
 **UI layer — .NET MAUI views, ViewModels, services, and DI.**
 
-- MVVM ViewModels (`MainShellViewModel`, `ExplorerViewModel`, `EditorViewModel`, `TerminalViewModel`)
-- Visual layout (`MainShell`, `ActivityBarView`, `ExplorerView`, `EditorTabsView`, `EditorHostView`, `BottomPanelView`, `StatusBarView`)
-- Application services (`EditorService`)
-- Value converters for data binding
+- MVVM ViewModels (`MainShellViewModel`, `ExplorerViewModel`, `EditorViewModel`, `TerminalViewModel`, `SearchViewModel`, `GitViewModel`, `SettingsViewModel`)
+- Visual layout (12 views including `MainShell`, `ExplorerView`, `EditorHostView`, `BottomPanelView`, `GitPanelView`, `SearchPanelView`, `CommandPaletteView`, `WelcomeView`, `SettingsView`)
+- Application services (`EditorService`, `SettingsService`, `SearchService`, `CommandPaletteService`, `KeyboardShortcutService`, `FileWatcherService`, `AppStateService`, `ThemeService`, `AppLogger`, `GlobalExceptionHandler`)
+- Value converters for data binding (`BoolToIcon`, `TabColor`, `IsNull`, `IsNotNull`, `InverseBool`)
+- Theme system with `DarkTheme.xaml` and `LightTheme.xaml` resource dictionaries
 - DI registration in `MauiProgram.cs`
 - **Dependencies:** DroidIDE.Core, DroidIDE.Infrastructure, DroidIDE.Terminal
 - **Status:** ✅ Implemented
@@ -55,10 +56,12 @@ DroidIDE is composed of **8 projects** organized in a clean architecture. Each l
 ## DroidIDE.Editor
 **Code editor with Monaco WebView and Roslyn language services.**
 
-- Monaco editor integration via WebView + JS interop
-- Roslyn-powered IntelliSense, diagnostics, and refactoring
-- **Dependencies:** DroidIDE.Core
-- **Status:** 🔲 Planned (Phase 3)
+- `MonacoEditorBridge` — JS interop between MAUI WebView and Monaco
+- `RoslynLanguageService` — Roslyn-powered IntelliSense and analysis
+- `DiagnosticService` — real-time error/warning detection
+- `RefactoringService` — Roslyn code actions (rename, extract, etc.)
+- **Dependencies:** DroidIDE.Core, Microsoft.CodeAnalysis
+- **Status:** ✅ Implemented
 
 ---
 
@@ -66,10 +69,11 @@ DroidIDE is composed of **8 projects** organized in a clean architecture. Each l
 **dotnet CLI wrapper for build, run, and project management commands.**
 
 - `DotnetCliService` — wrapper for `dotnet build`, `dotnet run`, `dotnet new`, etc.
-- Build output streaming and error parsing
-- Process lifecycle management for running apps
+- `BuildService` — build execution with structured output and error parsing
+- `RunService` — process lifecycle management for running apps
+- `ServiceManager` — multi-service tracking for microservices
 - **Dependencies:** DroidIDE.Core, DroidIDE.Infrastructure
-- **Status:** 🔲 Planned (Phase 2)
+- **Status:** ✅ Implemented
 
 ---
 
@@ -80,7 +84,7 @@ DroidIDE is composed of **8 projects** organized in a clean architecture. Each l
 - `ProjectParser` — parse `.csproj` files for metadata and references
 - `NuGetManager` — package management
 - **Dependencies:** DroidIDE.Core
-- **Status:** 🔲 Planned (Phase 2)
+- **Status:** ✅ Implemented
 
 ---
 
@@ -91,4 +95,4 @@ DroidIDE is composed of **8 projects** organized in a clean architecture. Each l
 - `BranchManager` — branch listing and management
 - `RepositoryManager` — repo state and file status tracking
 - **Dependencies:** DroidIDE.Core, LibGit2Sharp
-- **Status:** 🔲 Planned (Phase 4)
+- **Status:** ✅ Implemented

@@ -1,12 +1,12 @@
 ﻿# Runtime Layer — `DroidIDE.Runtime`
 
-> **Status:** 🔲 Planned for Phase 2
+> **Status:** ✅ Implemented
 
-The Runtime layer will wrap all `dotnet` CLI commands, providing build/run/test execution with real-time output streaming.
+The Runtime layer wraps all `dotnet` CLI commands, providing build/run/test execution with real-time output streaming.
 
 ---
 
-## Planned Structure
+## Directory Structure
 
 ```
 DroidIDE.Runtime/
@@ -22,7 +22,7 @@ DroidIDE.Runtime/
 
 ---
 
-## Planned Features
+## Features
 
 ### DotnetCliService (`IDotnetCli`)
 Wraps the dotnet CLI via `IProcessManager`:
@@ -48,17 +48,17 @@ All methods support `Action<string> onOutput` for real-time streaming.
 ### RunService
 - Execute `dotnet run` with process lifecycle management
 - Support start/stop/restart of running application
-- Port detection for ASP.NET Core apps (Phase 4)
+- Port detection for ASP.NET Core apps
 - Output streaming to terminal panel
 
-### ServiceManager (Phase 4)
+### ServiceManager
 - Track multiple independently running services
 - Start/stop individual microservices
 - Health monitoring dashboard
 
 ---
 
-## Dependencies (Planned)
+## Dependencies
 
 - `DroidIDE.Core` (for `IDotnetCli`, `BuildResult`, `BuildStatus`)
 - `DroidIDE.Infrastructure` (for `IProcessManager`)

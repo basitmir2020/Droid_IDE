@@ -10,7 +10,7 @@ These rules ensure consistency, maintainability, and architectural integrity acr
 
 2. **All OS operations go through Infrastructure.** File system access (`System.IO`) and process execution (`System.Diagnostics.Process`) must only appear in `DroidIDE.Infrastructure`. Other layers consume these via `IFileSystemService` and `IProcessManager`.
 
-3. **All dotnet CLI calls go through the Runtime layer.** No layer except Runtime should invoke `dotnet build`, `dotnet run`, etc. directly.
+3. **All dotnet CLI calls go through the Runtime layer.** No layer except Runtime should invoke `dotnet build`, `dotnet run`, etc. directly. Use `IDotnetCli` via DI.
 
 4. **Editor must use Roslyn, not custom parsing.** IntelliSense, diagnostics, and refactoring must be powered by `Microsoft.CodeAnalysis`, not ad-hoc regex or string parsing.
 
@@ -42,6 +42,8 @@ These rules ensure consistency, maintainability, and architectural integrity acr
 
 14. **No hardcoded content in views.** All dynamic content must come from ViewModel bindings. Hardcoded placeholder text is only acceptable in `EmptyView` templates.
 
+15. **Use `Border`, not `Frame`.** All card-style containers must use `Border` with `StrokeShape` and `Stroke` properties. `Frame` is deprecated in .NET 10+.
+
 ---
 
 ## Code Style
@@ -53,3 +55,13 @@ These rules ensure consistency, maintainability, and architectural integrity acr
 17. **Use `ConcurrentDictionary` for shared state.** Multi-session tracking (terminals, processes) must use thread-safe collections.
 
 18. **XML documentation on all public APIs.** All public classes, methods, and interfaces must have `///` XML doc comments.
+
+---
+
+## Cross-Cutting Rules
+
+19. **All exceptions must be caught.** `GlobalExceptionHandler` is wired at startup. Unhandled exceptions are logged and shown to the user, never silently swallowed.
+
+20. **Use `AppLogger` for diagnostic output.** Never use `Console.WriteLine` or `Debug.WriteLine` for persistent logging. Use `AppLogger.LogInfo/Warn/Error/Debug` instead.
+
+21. **Theme resources via `ThemeService`.** Never hardcode theme changes. Use `ThemeService.SetTheme()` or `ThemeService.ToggleTheme()` to switch themes at runtime.
