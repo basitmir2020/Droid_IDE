@@ -1,33 +1,91 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="DroidIDE.App.Views.Layout.ExplorerView" BackgroundColor="#1E1E1E">
-    <VerticalStackLayout>
+             xmlns:vm="clr-namespace:DroidIDE.App.ViewModels"
+             xmlns:models="clr-namespace:DroidIDE.Core.Models;assembly=DroidIDE.Core"
+             x:Class="DroidIDE.App.Views.Layout.ExplorerView"
+             x:DataType="vm:ExplorerViewModel"
+             BackgroundColor="#252526">
 
-        <Label Text="EXPLORER"
-               TextColor="#CCCCCC"
-               FontSize="12"
-               Padding="12,8"/>
+    <Grid RowSpacing="0">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="36"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
 
-        <CollectionView>
-            <CollectionView.ItemsSource>
-                <x:Array Type="{x:Type x:String}">
-                    <x:String>Program.cs</x:String>
-                    <x:String>Startup.cs</x:String>
-                    <x:String>appsettings.json</x:String>
-                </x:Array>
-            </CollectionView.ItemsSource>
+        <!-- Header -->
+        <Grid Grid.Row="0" BackgroundColor="#252526" Padding="12,0">
+            <Label Text="EXPLORER"
+                   TextColor="#BBBBBB"
+                   FontSize="11"
+                   FontAttributes="Bold"
+                   VerticalOptions="Center"/>
+
+            <ImageButton Source="refresh"
+                         WidthRequest="16"
+                         HeightRequest="16"
+                         HorizontalOptions="End"
+                         VerticalOptions="Center"
+                         BackgroundColor="Transparent"
+                         Command="{Binding RefreshCommand}"/>
+        </Grid>
+
+        <!-- File Tree -->
+        <CollectionView Grid.Row="1"
+                        ItemsSource="{Binding RootItems}"
+                        SelectionMode="Single"
+                        SelectedItem="{Binding SelectedItem, Mode=TwoWay}">
 
             <CollectionView.ItemTemplate>
-                <DataTemplate>
-                    <Label Text="{Binding}"
-                           TextColor="#D4D4D4"
-                           Padding="20,6"/>
+                <DataTemplate x:DataType="models:FileItem">
+                    <Grid Padding="20,6,10,6" ColumnSpacing="8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="16"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Folder/File indicator -->
+                        <Label Grid.Column="0"
+                               Text="{Binding IsDirectory, Converter={StaticResource BoolToIconConverter}}"
+                               TextColor="#CCCCCC"
+                               FontSize="12"
+                               VerticalOptions="Center"/>
+
+                        <!-- File name -->
+                        <Label Grid.Column="1"
+                               Text="{Binding Name}"
+                               TextColor="#D4D4D4"
+                               FontSize="13"
+                               VerticalOptions="Center"/>
+                    </Grid>
                 </DataTemplate>
             </CollectionView.ItemTemplate>
 
+            <CollectionView.EmptyView>
+                <VerticalStackLayout VerticalOptions="Center"
+                                     HorizontalOptions="Center"
+                                     Padding="20">
+                    <Label Text="No folder opened"
+                           TextColor="#888888"
+                           FontSize="13"
+                           HorizontalOptions="Center"/>
+                    <Label Text="Open a folder to get started"
+                           TextColor="#666666"
+                           FontSize="11"
+                           HorizontalOptions="Center"
+                           Margin="0,4,0,0"/>
+                </VerticalStackLayout>
+            </CollectionView.EmptyView>
+
         </CollectionView>
 
-    </VerticalStackLayout>
-</ContentPage>
+        <!-- Loading indicator -->
+        <ActivityIndicator Grid.Row="1"
+                           IsRunning="{Binding IsBusy}"
+                           IsVisible="{Binding IsBusy}"
+                           Color="#0078D4"
+                           VerticalOptions="Center"
+                           HorizontalOptions="Center"/>
+    </Grid>
+</ContentView>

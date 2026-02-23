@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DroidIDE.App.Views.Layout;
 
-public partial class BottomPanelView : ContentPage
+public partial class BottomPanelView : ContentView
 {
     public BottomPanelView()
     {

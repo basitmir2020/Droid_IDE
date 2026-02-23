@@ -1,25 +1,69 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="DroidIDE.App.Views.Layout.EditorTabsView" BackgroundColor="#1E1E1E">
-    <HorizontalStackLayout>
+             xmlns:vm="clr-namespace:DroidIDE.App.ViewModels"
+             xmlns:models="clr-namespace:DroidIDE.Core.Models;assembly=DroidIDE.Core"
+             x:Class="DroidIDE.App.Views.Layout.EditorTabsView"
+             x:DataType="vm:EditorViewModel"
+             BackgroundColor="#2D2D30">
 
-        <Frame BackgroundColor="#1E1E1E"
-               Padding="10,6"
-               HasShadow="False">
+    <ScrollView Orientation="Horizontal" HorizontalScrollBarVisibility="Never">
+        <CollectionView ItemsSource="{Binding OpenTabs}"
+                        SelectionMode="Single"
+                        SelectedItem="{Binding ActiveTab, Mode=TwoWay}"
+                        ItemsLayout="HorizontalList">
 
-            <Label Text="Program.cs"
-                   TextColor="#FFFFFF"/>
-        </Frame>
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="models:EditorTab">
+                    <Border BackgroundColor="{Binding IsActive, Converter={StaticResource BoolToTabColorConverter}}"
+                            Stroke="Transparent"
+                            StrokeShape="RoundRectangle 0"
+                            Padding="12,8"
+                            MinimumWidthRequest="100">
 
-        <Frame BackgroundColor="#2D2D30"
-               Padding="10,6"
-               HasShadow="False">
+                        <Grid ColumnSpacing="8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="14"/>
+                            </Grid.ColumnDefinitions>
 
-            <Label Text="Startup.cs"
-                   TextColor="#AAAAAA"/>
-        </Frame>
+                            <!-- Tab title with modification indicator -->
+                            <Label Grid.Column="0"
+                                   TextColor="{Binding IsActive, Converter={StaticResource BoolToTabTextColorConverter}}"
+                                   FontSize="12"
+                                   VerticalOptions="Center">
+                                <Label.Text>
+                                    <MultiBinding StringFormat="{}{0}{1}">
+                                        <Binding Path="DisplayName"/>
+                                        <Binding Path="IsModified" Converter="{StaticResource BoolToModifiedDotConverter}"/>
+                                    </MultiBinding>
+                                </Label.Text>
+                            </Label>
 
-    </HorizontalStackLayout>
-</ContentPage>
+                            <!-- Close button -->
+                            <Label Grid.Column="1"
+                                   Text="✕"
+                                   TextColor="#888888"
+                                   FontSize="10"
+                                   VerticalOptions="Center"
+                                   HorizontalOptions="Center">
+                                <Label.GestureRecognizers>
+                                    <TapGestureRecognizer
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type vm:EditorViewModel}}, Path=CloseTabCommand}"
+                                        CommandParameter="{Binding}"/>
+                                </Label.GestureRecognizers>
+                            </Label>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+
+            <CollectionView.EmptyView>
+                <Label Text=""
+                       BackgroundColor="#2D2D30"/>
+            </CollectionView.EmptyView>
+
+        </CollectionView>
+    </ScrollView>
+</ContentView>

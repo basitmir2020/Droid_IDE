@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DroidIDE.App.Views.Terminal;
 
-public partial class TerminalView : ContentPage
+public partial class TerminalView : ContentView
 {
     public TerminalView()
     {

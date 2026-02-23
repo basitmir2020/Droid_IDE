@@ -1,40 +1,126 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="DroidIDE.App.Views.Layout.BottomPanelView" BackgroundColor="#1E1E1E">
-    <Grid>
+             xmlns:vm="clr-namespace:DroidIDE.App.ViewModels"
+             x:Class="DroidIDE.App.Views.Layout.BottomPanelView"
+             x:DataType="vm:TerminalViewModel"
+             BackgroundColor="#1E1E1E">
 
+    <Grid RowSpacing="0">
         <Grid.RowDefinitions>
             <RowDefinition Height="36"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <!-- Tabs -->
+        <!-- Panel Tab Bar -->
         <HorizontalStackLayout
             Grid.Row="0"
             BackgroundColor="#252526"
-            Padding="10,0">
+            Padding="10,0"
+            Spacing="4">
 
-            <Label Text="TERMINAL"
-                   TextColor="#FFFFFF"
-                   Margin="0,0,20,0"/>
+            <Border BackgroundColor="#1E1E1E"
+                    Stroke="Transparent"
+                    StrokeShape="RoundRectangle 0"
+                    Padding="10,6">
+                <Label Text="TERMINAL"
+                       TextColor="#FFFFFF"
+                       FontSize="11"
+                       FontAttributes="Bold"/>
+            </Border>
 
-            <Label Text="OUTPUT"
-                   TextColor="#AAAAAA"
-                   Margin="0,0,20,0"/>
+            <Border BackgroundColor="Transparent"
+                    Stroke="Transparent"
+                    Padding="10,6">
+                <Label Text="OUTPUT"
+                       TextColor="#888888"
+                       FontSize="11"/>
+            </Border>
 
-            <Label Text="PROBLEMS"
-                   TextColor="#AAAAAA"/>
+            <Border BackgroundColor="Transparent"
+                    Stroke="Transparent"
+                    Padding="10,6">
+                <Label Text="PROBLEMS"
+                       TextColor="#888888"
+                       FontSize="11"/>
+            </Border>
+
+            <!-- Spacer -->
+            <BoxView HorizontalOptions="FillAndExpand"
+                     Color="Transparent"/>
+
+            <!-- New Terminal Button -->
+            <ImageButton WidthRequest="16"
+                         HeightRequest="16"
+                         VerticalOptions="Center"
+                         BackgroundColor="Transparent"
+                         Command="{Binding NewSessionCommand}"/>
+
+            <!-- Clear Button -->
+            <Label Text="⌫"
+                   TextColor="#888888"
+                   FontSize="14"
+                   VerticalOptions="Center"
+                   Margin="6,0">
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding ClearOutputCommand}"/>
+                </Label.GestureRecognizers>
+            </Label>
 
         </HorizontalStackLayout>
 
-        <!-- Content -->
-        <ScrollView Grid.Row="1">
-            <Label Text="Terminal Output Here..."
-                   TextColor="#CCCCCC"
-                   Padding="10"/>
-        </ScrollView>
+        <!-- Terminal Output -->
+        <CollectionView Grid.Row="1"
+                        ItemsSource="{Binding OutputLines}"
+                        BackgroundColor="#1E1E1E"
+                        Margin="0">
 
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="x:String">
+                    <Label Text="{Binding}"
+                           TextColor="#CCCCCC"
+                           FontFamily="monospace"
+                           FontSize="12"
+                           Padding="10,1"/>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+
+            <CollectionView.EmptyView>
+                <Label Text="Terminal ready. Type a command below."
+                       TextColor="#666666"
+                       FontSize="12"
+                       Padding="10,8"/>
+            </CollectionView.EmptyView>
+        </CollectionView>
+
+        <!-- Command Input -->
+        <Grid Grid.Row="2"
+              BackgroundColor="#1E1E1E"
+              Padding="10,4"
+              ColumnSpacing="8">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Label Grid.Column="0"
+                   Text="$"
+                   TextColor="#0078D4"
+                   FontFamily="monospace"
+                   FontSize="13"
+                   VerticalOptions="Center"/>
+
+            <Entry Grid.Column="1"
+                   Text="{Binding CommandInput, Mode=TwoWay}"
+                   Placeholder="Enter command..."
+                   PlaceholderColor="#666666"
+                   TextColor="#CCCCCC"
+                   BackgroundColor="#1E1E1E"
+                   FontFamily="monospace"
+                   FontSize="13"
+                   ReturnCommand="{Binding SendCommandCommand}"/>
+        </Grid>
     </Grid>
-</ContentPage>
+</ContentView>

@@ -1,10 +1,13 @@
-﻿namespace DroidIDE.App.Views.Shell;
+﻿using DroidIDE.App.ViewModels;
+
+namespace DroidIDE.App.Views.Shell;
 
 public partial class MainShell : ContentPage
 {
-    public MainShell()
+    public MainShell(MainShellViewModel viewModel)
     {
         InitializeComponent();
+        BindingContext = viewModel;
         AddVerticalResize();
         AddHorizontalResize();
     }

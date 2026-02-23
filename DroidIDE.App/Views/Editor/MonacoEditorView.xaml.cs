@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DroidIDE.App.Views.Editor;
 
-public partial class MonacoEditorView : ContentPage
+public partial class MonacoEditorView : ContentView
 {
     public MonacoEditorView()
     {

@@ -2,6 +2,7 @@
 <Application xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:local="clr-namespace:DroidIDE.App"
+             xmlns:converters="clr-namespace:DroidIDE.App.Converters"
              x:Class="DroidIDE.App.App">
     <Application.Resources>
         <ResourceDictionary>
@@ -9,8 +10,15 @@
                 <ResourceDictionary Source="Resources/Styles/Colors.xaml" />
                 <ResourceDictionary Source="Resources/Styles/Styles.xaml" />
                 <ResourceDictionary Source="Resources/Themes/DarkTheme.xaml" />
-                <ResourceDictionary Source="Resources/Themes/LightTheme.xaml" />
             </ResourceDictionary.MergedDictionaries>
+
+            <!-- Value Converters -->
+            <converters:BoolToIconConverter x:Key="BoolToIconConverter"/>
+            <converters:BoolToTabColorConverter x:Key="BoolToTabColorConverter"/>
+            <converters:BoolToTabTextColorConverter x:Key="BoolToTabTextColorConverter"/>
+            <converters:BoolToModifiedDotConverter x:Key="BoolToModifiedDotConverter"/>
+            <converters:IsNotNullConverter x:Key="IsNotNullConverter"/>
+            <converters:IsNullConverter x:Key="IsNullConverter"/>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

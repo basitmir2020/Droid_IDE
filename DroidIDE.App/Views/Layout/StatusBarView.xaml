@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:DroidIDE.App.ViewModels"
+             x:Class="DroidIDE.App.Views.Layout.StatusBarView"
+             x:DataType="vm:MainShellViewModel"
+             BackgroundColor="#007ACC"
+             HeightRequest="24">
+
+    <Grid Padding="10,0" ColumnSpacing="16">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Branch name placeholder -->
+        <Label Grid.Column="0"
+               Text="⎇ main"
+               TextColor="#FFFFFF"
+               FontSize="11"
+               VerticalOptions="Center"/>
+
+        <!-- Status text -->
+        <Label Grid.Column="1"
+               Text="{Binding StatusText}"
+               TextColor="#FFFFFF"
+               FontSize="11"
+               VerticalOptions="Center"/>
+
+        <!-- Spacer -->
+        <BoxView Grid.Column="2" Color="Transparent"/>
+
+        <!-- Cursor position from active editor tab -->
+        <Label Grid.Column="3"
+               Text="{Binding Editor.ActiveTab.CursorLine, StringFormat='Ln {0}'}"
+               TextColor="#FFFFFF"
+               FontSize="11"
+               VerticalOptions="Center"/>
+
+        <!-- Language -->
+        <Label Grid.Column="4"
+               Text="{Binding Editor.ActiveTab.Language}"
+               TextColor="#FFFFFF"
+               FontSize="11"
+               VerticalOptions="Center"/>
+    </Grid>
+</ContentView>

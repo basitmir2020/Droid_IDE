@@ -3,46 +3,78 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:layout="clr-namespace:DroidIDE.App.Views.Layout"
-             x:Class="DroidIDE.App.Views.Shell.MainShell"  BackgroundColor="#1E1E1E">
-    <Grid ColumnSpacing="0" RowSpacing="0">
+             xmlns:vm="clr-namespace:DroidIDE.App.ViewModels"
+             x:Class="DroidIDE.App.Views.Shell.MainShell"
+             x:DataType="vm:MainShellViewModel"
+             BackgroundColor="#1E1E1E">
 
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="48"/>
-            <ColumnDefinition x:Name="ExplorerColumn" Width="260"/>
-            <ColumnDefinition Width="6"/>   <!-- Vertical Splitter -->
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
+    <Grid RowSpacing="0" ColumnSpacing="0">
 
-        <layout:ActivityBarView Grid.Column="0"/>
-        <layout:ExplorerView Grid.Column="1"/>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="24"/>
+        </Grid.RowDefinitions>
 
-        <!-- Vertical Splitter -->
-        <BoxView x:Name="VerticalSplitter"
-                 Grid.Column="2"
-                 WidthRequest="6"
-                 BackgroundColor="#444444"/>
+        <!-- Main Content Area -->
+        <Grid Grid.Row="0" ColumnSpacing="0" RowSpacing="0">
 
-        <!-- Editor Area -->
-        <Grid Grid.Column="3">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="48"/>
+                <ColumnDefinition x:Name="ExplorerColumn" Width="260"/>
+                <ColumnDefinition Width="6"/>   <!-- Vertical Splitter -->
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
 
-            <Grid.RowDefinitions>
-                <RowDefinition Height="40"/>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="6"/>  <!-- Horizontal Splitter -->
-                <RowDefinition x:Name="BottomRow" Height="220"/>
-            </Grid.RowDefinitions>
+            <!-- Activity Bar — binds to MainShellViewModel -->
+            <layout:ActivityBarView Grid.Column="0"
+                                    BindingContext="{Binding}"/>
 
-            <layout:EditorTabsView Grid.Row="0"/>
-            <layout:EditorHostView Grid.Row="1"/>
+            <!-- Explorer — binds to ExplorerViewModel -->
+            <layout:ExplorerView Grid.Column="1"
+                                 BindingContext="{Binding Explorer}"
+                                 IsVisible="{Binding IsExplorerVisible}"/>
 
-            <!-- Horizontal Splitter -->
-            <BoxView x:Name="HorizontalSplitter"
-                     Grid.Row="2"
-                     HeightRequest="6"
+            <!-- Vertical Splitter -->
+            <BoxView x:Name="VerticalSplitter"
+                     Grid.Column="2"
+                     WidthRequest="6"
                      BackgroundColor="#444444"/>
 
-            <layout:BottomPanelView Grid.Row="3"/>
+            <!-- Editor Area -->
+            <Grid Grid.Column="3" RowSpacing="0">
 
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="40"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="6"/>  <!-- Horizontal Splitter -->
+                    <RowDefinition x:Name="BottomRow" Height="220"/>
+                </Grid.RowDefinitions>
+
+                <!-- Editor Tabs — binds to EditorViewModel -->
+                <layout:EditorTabsView Grid.Row="0"
+                                       BindingContext="{Binding Editor}"/>
+
+                <!-- Editor Host — binds to EditorViewModel -->
+                <layout:EditorHostView Grid.Row="1"
+                                       BindingContext="{Binding Editor}"/>
+
+                <!-- Horizontal Splitter -->
+                <BoxView x:Name="HorizontalSplitter"
+                         Grid.Row="2"
+                         HeightRequest="6"
+                         BackgroundColor="#444444"/>
+
+                <!-- Bottom Panel — binds to TerminalViewModel -->
+                <layout:BottomPanelView Grid.Row="3"
+                                        BindingContext="{Binding Terminal}"
+                                        IsVisible="{Binding Source={RelativeSource AncestorType={x:Type vm:MainShellViewModel}}, Path=IsBottomPanelVisible}"/>
+
+            </Grid>
         </Grid>
+
+        <!-- Status Bar -->
+        <layout:StatusBarView Grid.Row="1"
+                              BindingContext="{Binding}"/>
+
     </Grid>
 </ContentPage>

@@ -1,32 +1,56 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="DroidIDE.App.Views.Layout.ActivityBarView" BackgroundColor="#1E1E1E">
+             xmlns:vm="clr-namespace:DroidIDE.App.ViewModels"
+             x:Class="DroidIDE.App.Views.Layout.ActivityBarView"
+             x:DataType="vm:MainShellViewModel"
+             BackgroundColor="#333333">
+
     <VerticalStackLayout
-        Spacing="20"
-        Padding="0,20"
+        Spacing="4"
+        Padding="4,12"
         HorizontalOptions="Center">
 
-        <ImageButton Source="explorer.png"
-                     WidthRequest="24"
-                     HeightRequest="24"
-                     BackgroundColor="Transparent"/>
+        <!-- Explorer -->
+        <ImageButton Source="explorer.svg"
+                     WidthRequest="28"
+                     HeightRequest="28"
+                     Padding="4"
+                     BackgroundColor="Transparent"
+                     Command="{Binding ShowPanelCommand}"
+                     CommandParameter="Explorer"
+                     ToolTipProperties.Text="Explorer"/>
 
-        <ImageButton Source="search.png"
-                     WidthRequest="24"
-                     HeightRequest="24"
-                     BackgroundColor="Transparent"/>
+        <!-- Search -->
+        <ImageButton Source="search.svg"
+                     WidthRequest="28"
+                     HeightRequest="28"
+                     Padding="4"
+                     BackgroundColor="Transparent"
+                     Command="{Binding ShowPanelCommand}"
+                     CommandParameter="Search"
+                     ToolTipProperties.Text="Search"/>
 
-        <ImageButton Source="git.png"
-                     WidthRequest="24"
-                     HeightRequest="24"
-                     BackgroundColor="Transparent"/>
+        <!-- Git -->
+        <ImageButton Source="git.svg"
+                     WidthRequest="28"
+                     HeightRequest="28"
+                     Padding="4"
+                     BackgroundColor="Transparent"
+                     Command="{Binding ShowPanelCommand}"
+                     CommandParameter="Git"
+                     ToolTipProperties.Text="Source Control"/>
 
-        <ImageButton Source="debug.png"
-                     WidthRequest="24"
-                     HeightRequest="24"
-                     BackgroundColor="Transparent"/>
+        <!-- Debug -->
+        <ImageButton Source="debug.svg"
+                     WidthRequest="28"
+                     HeightRequest="28"
+                     Padding="4"
+                     BackgroundColor="Transparent"
+                     Command="{Binding ShowPanelCommand}"
+                     CommandParameter="Debug"
+                     ToolTipProperties.Text="Run and Debug"/>
 
     </VerticalStackLayout>
-</ContentPage>
+</ContentView>

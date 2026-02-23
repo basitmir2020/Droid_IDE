@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DroidIDE.App.Views.Layout;
 
-public partial class EditorHostView : ContentPage
+public partial class EditorHostView : ContentView
 {
     public EditorHostView()
     {

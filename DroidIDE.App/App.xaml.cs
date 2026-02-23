@@ -4,13 +4,17 @@ namespace DroidIDE.App;
 
 public partial class App : Application
 {
-	public App()
-	{
-		InitializeComponent();
-	}
+    private readonly IServiceProvider _serviceProvider;
 
-	protected override Window CreateWindow(IActivationState? activationState)
-	{
-		return new Window(new MainShell());
-	}
+    public App(IServiceProvider serviceProvider)
+    {
+        _serviceProvider = serviceProvider;
+        InitializeComponent();
+    }
+
+    protected override Window CreateWindow(IActivationState? activationState)
+     {
+        var mainShell = _serviceProvider.GetRequiredService<MainShell>();
+        return new Window(mainShell);
+    }
 }

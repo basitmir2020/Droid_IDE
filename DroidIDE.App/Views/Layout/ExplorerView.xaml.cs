@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DroidIDE.App.Views.Layout;
 
-public partial class ExplorerView : ContentPage
+public partial class ExplorerView : ContentView
 {
     public ExplorerView()
     {

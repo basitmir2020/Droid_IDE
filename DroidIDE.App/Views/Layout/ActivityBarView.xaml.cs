@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DroidIDE.App.Views.Layout;
 
-public partial class ActivityBarView : ContentPage
+public partial class ActivityBarView : ContentView
 {
     public ActivityBarView()
     {

@@ -1,10 +1,41 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="DroidIDE.App.Views.Layout.EditorHostView" BackgroundColor="#1E1E1E">
-    <Label Text="Editor Area (Monaco will go here)"
-           TextColor="#888888"
-           HorizontalOptions="Center"
-           VerticalOptions="Center"/>
-</ContentPage>
+             xmlns:vm="clr-namespace:DroidIDE.App.ViewModels"
+             x:Class="DroidIDE.App.Views.Layout.EditorHostView"
+             x:DataType="vm:EditorViewModel"
+             BackgroundColor="#1E1E1E">
+
+    <Grid>
+        <!-- Editor content when a tab is active -->
+        <Editor Text="{Binding ActiveTab.Content, Mode=TwoWay}"
+                TextColor="#D4D4D4"
+                BackgroundColor="#1E1E1E"
+                FontFamily="monospace"
+                FontSize="14"
+                IsVisible="{Binding ActiveTab, Converter={StaticResource IsNotNullConverter}}"
+                IsSpellCheckEnabled="False"
+                IsTextPredictionEnabled="False"
+                Keyboard="Plain"
+                AutoSize="Disabled"/>
+
+        <!-- Empty state when no tab is open -->
+        <VerticalStackLayout VerticalOptions="Center"
+                             HorizontalOptions="Center"
+                             IsVisible="{Binding ActiveTab, Converter={StaticResource IsNullConverter}}">
+
+            <Label Text="DroidIDE"
+                   TextColor="#555555"
+                   FontSize="36"
+                   FontAttributes="Bold"
+                   HorizontalOptions="Center"/>
+
+            <Label Text="Open a file from the Explorer to start editing"
+                   TextColor="#555555"
+                   FontSize="14"
+                   HorizontalOptions="Center"
+                   Margin="0,8,0,0"/>
+        </VerticalStackLayout>
+    </Grid>
+</ContentView>

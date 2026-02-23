@@ -1,24 +1,48 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using DroidIDE.App.Services;
+using DroidIDE.App.ViewModels;
+using DroidIDE.App.Views.Shell;
+using DroidIDE.Core.Interfaces;
+using DroidIDE.Infrastructure.FileSystem;
+using DroidIDE.Infrastructure.Process;
+using DroidIDE.Terminal.ProcessSession;
+using Microsoft.Extensions.Logging;
 
 namespace DroidIDE.App;
 
 public static class MauiProgram
 {
-	public static MauiApp CreateMauiApp()
-	{
-		var builder = MauiApp.CreateBuilder();
-		builder
-			.UseMauiApp<App>()
-			.ConfigureFonts(fonts =>
-			{
-				fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
-				fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
-			});
+    public static MauiApp CreateMauiApp()
+    {
+        var builder = MauiApp.CreateBuilder();
+        builder
+            .UseMauiApp<App>()
+            .ConfigureFonts(fonts =>
+            {
+                fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
+                fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
+            });
+
+        // ── Infrastructure Services ──
+        builder.Services.AddSingleton<IFileSystemService, FileSystemService>();
+        builder.Services.AddSingleton<IProcessManager, ProcessManager>();
+        builder.Services.AddSingleton<ITerminalService, ProcessSessionManager>();
+
+        // ── App Services ──
+        builder.Services.AddSingleton<IEditorService, EditorService>();
+
+        // ── ViewModels ──
+        builder.Services.AddSingleton<MainShellViewModel>();
+        builder.Services.AddSingleton<ExplorerViewModel>();
+        builder.Services.AddSingleton<EditorViewModel>();
+        builder.Services.AddSingleton<TerminalViewModel>();
+
+        // ── Pages / Views ──
+        builder.Services.AddSingleton<MainShell>();
 
 #if DEBUG
-		builder.Logging.AddDebug();
+        builder.Logging.AddDebug();
 #endif
 
-		return builder.Build();
-	}
+        return builder.Build();
+    }
 }
