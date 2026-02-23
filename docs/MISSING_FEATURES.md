@@ -2,7 +2,7 @@
 
 This document tracks features that are **not yet implemented**. Items marked ~~strikethrough~~ were previously missing but have since been completed.
 
-> **Last updated:** Phase 2 complete
+> **Last updated:** Phase 3 complete
 
 ---
 
@@ -24,14 +24,10 @@ This document tracks features that are **not yet implemented**. Items marked ~~s
 ## ~~Runtime Layer~~ ✅
 ~~DotnetCliService (IDotnetCli), BuildService, RunService, and ServiceManager are implemented.~~
 
----
+## ~~Editor Layer~~ ✅
+~~MonacoEditorBridge (JS interop), monaco_editor.html (CDN-loaded Monaco), RoslynLanguageService (completions + hover), DiagnosticService (real-time analysis), RefactoringService (rename + code actions), MonacoEditorView (WebView), EditorHostView (Monaco integration) are implemented.~~
 
-## Editor Layer (Phase 3)
-- No Monaco WebView integration (Monaco folder is empty)
-- No Roslyn language server integration (LanguageServer folder is empty)
-- No diagnostics/error reporting (Diagnostics folder is empty)
-- No refactoring support (Refactoring folder is empty)
-- EditorHostView uses native MAUI Editor control instead of Monaco WebView
+---
 
 ## Git Layer (Phase 4)
 - No GitService implementation (GitService folder is empty)

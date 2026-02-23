@@ -2,8 +2,11 @@
 
 <ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="DroidIDE.App.Views.Editor.MonacoEditorView">
-    <ContentView.Content>
-        
-    </ContentView.Content>
+             x:Class="DroidIDE.App.Views.Editor.MonacoEditorView"
+             BackgroundColor="#1E1E1E">
+
+    <WebView x:Name="EditorWebView"
+             Source="monaco_editor.html"
+             BackgroundColor="#1E1E1E"/>
+
 </ContentView>

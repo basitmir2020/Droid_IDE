@@ -3,22 +3,15 @@
 <ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:DroidIDE.App.ViewModels"
+             xmlns:editor="clr-namespace:DroidIDE.App.Views.Editor"
              x:Class="DroidIDE.App.Views.Layout.EditorHostView"
              x:DataType="vm:EditorViewModel"
              BackgroundColor="#1E1E1E">
 
     <Grid>
-        <!-- Editor content when a tab is active -->
-        <Editor Text="{Binding ActiveTab.Content, Mode=TwoWay}"
-                TextColor="#D4D4D4"
-                BackgroundColor="#1E1E1E"
-                FontFamily="monospace"
-                FontSize="14"
-                IsVisible="{Binding ActiveTab, Converter={StaticResource IsNotNullConverter}}"
-                IsSpellCheckEnabled="False"
-                IsTextPredictionEnabled="False"
-                Keyboard="Plain"
-                AutoSize="Disabled"/>
+        <!-- Monaco editor when a tab is active -->
+        <editor:MonacoEditorView x:Name="MonacoEditor"
+                                  IsVisible="{Binding ActiveTab, Converter={StaticResource IsNotNullConverter}}"/>
 
         <!-- Empty state when no tab is open -->
         <VerticalStackLayout VerticalOptions="Center"

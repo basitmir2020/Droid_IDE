@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>DroidIDE Editor</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { width: 100%; height: 100%; overflow: hidden; background: #1E1E1E; }
+        #editor-container { width: 100%; height: 100%; }
+    </style>
+</head>
+<body>
+    <div id="editor-container"></div>
+
+    <!-- Monaco Editor from CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs/loader.js"></script>
+    <script>
+        let editor = null;
+        let currentModel = null;
+
+        // Configure Monaco AMD loader
+        require.config({
+            paths: { 'vs': 'https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs' }
+        });
+
+        // Load Monaco and initialize editor
+        require(['vs/editor/editor.main'], function () {
+            editor = monaco.editor.create(document.getElementById('editor-container'), {
+                value: '',
+                language: 'csharp',
+                theme: 'vs-dark',
+                automaticLayout: true,
+                minimap: { enabled: false },
+                fontSize: 14,
+                fontFamily: "'Cascadia Code', 'Fira Code', 'JetBrains Mono', 'Consolas', monospace",
+                lineNumbers: 'on',
+                scrollBeyondLastLine: false,
+                wordWrap: 'on',
+                tabSize: 4,
+                insertSpaces: true,
+                renderWhitespace: 'selection',
+                bracketPairColorization: { enabled: true },
+                guides: { bracketPairs: true, indentation: true },
+                smoothScrolling: true,
+                cursorBlinking: 'smooth',
+                cursorSmoothCaretAnimation: 'on',
+                padding: { top: 8, bottom: 8 },
+                suggest: { showMethods: true, showFunctions: true, showSnippets: true },
+                quickSuggestions: true,
+                parameterHints: { enabled: true },
+                folding: true,
+                foldingStrategy: 'indentation',
+                links: true,
+                contextmenu: true,
+                mouseWheelZoom: true,
+                fixedOverflowWidgets: true
+            });
+
+            currentModel = editor.getModel();
+
+            // Notify C# when content changes
+            editor.onDidChangeModelContent(function () {
+                try {
+                    // Use a debounced approach — the bridge polls or we use invokeCSharp
+                    window._lastContent = editor.getValue();
+                } catch (e) { }
+            });
+
+            // Notify C# when cursor position changes
+            editor.onDidChangeCursorPosition(function (e) {
+                try {
+                    window._cursorLine = e.position.lineNumber;
+                    window._cursorColumn = e.position.column;
+                } catch (e) { }
+            });
+        });
+
+        // ── Bridge Functions (called from C# via EvaluateJavaScriptAsync) ──
+
+        function setEditorContent(content, language) {
+            if (!editor) return;
+            var model = editor.getModel();
+            if (model) {
+                monaco.editor.setModelLanguage(model, language || 'csharp');
+                model.setValue(content);
+            }
+        }
+
+        function getEditorContent() {
+            if (!editor) return '';
+            return editor.getValue();
+        }
+
+        function setEditorLanguage(language) {
+            if (!editor) return;
+            var model = editor.getModel();
+            if (model) {
+                monaco.editor.setModelLanguage(model, language);
+            }
+        }
+
+        function setEditorTheme(theme) {
+            monaco.editor.setTheme(theme);
+        }
+
+        function setEditorMarkers(markers) {
+            if (!editor) return;
+            var model = editor.getModel();
+            if (!model) return;
+
+            var monacoMarkers = markers.map(function (m) {
+                return {
+                    startLineNumber: m.StartLineNumber,
+                    startColumn: m.StartColumn,
+                    endLineNumber: m.EndLineNumber,
+                    endColumn: m.EndColumn,
+                    message: m.Message,
+                    severity: mapSeverity(m.Severity)
+                };
+            });
+
+            monaco.editor.setModelMarkers(model, 'droidide', monacoMarkers);
+        }
+
+        function mapSeverity(severity) {
+            switch (severity) {
+                case 8: return monaco.MarkerSeverity.Error;
+                case 4: return monaco.MarkerSeverity.Warning;
+                case 2: return monaco.MarkerSeverity.Info;
+                case 1: return monaco.MarkerSeverity.Hint;
+                default: return monaco.MarkerSeverity.Info;
+            }
+        }
+
+        function getCursorPosition() {
+            if (!editor) return JSON.stringify({ Line: 1, Column: 1 });
+            var pos = editor.getPosition();
+            return JSON.stringify({ Line: pos.lineNumber, Column: pos.column });
+        }
+
+        function setCompletions(completions) {
+            // Register a one-shot completion provider for provided items
+            if (!editor) return;
+            window._pendingCompletions = completions;
+        }
+
+        function setReadOnly(readOnly) {
+            if (!editor) return;
+            editor.updateOptions({ readOnly: readOnly });
+        }
+
+        function goToPosition(line, column) {
+            if (!editor) return;
+            editor.setPosition({ lineNumber: line, column: column });
+            editor.revealLineInCenter(line);
+            editor.focus();
+        }
+
+        // Register a universal completion provider for C#
+        require(['vs/editor/editor.main'], function () {
+            monaco.languages.registerCompletionItemProvider('csharp', {
+                triggerCharacters: ['.'],
+                provideCompletionItems: function (model, position) {
+                    if (window._pendingCompletions && window._pendingCompletions.length > 0) {
+                        var items = window._pendingCompletions.map(function (c) {
+                            return {
+                                label: c.Label,
+                                kind: c.Kind,
+                                insertText: c.InsertText,
+                                detail: c.Detail || '',
+                                documentation: c.Documentation || ''
+                            };
+                        });
+                        window._pendingCompletions = [];
+                        return { suggestions: items };
+                    }
+                    return { suggestions: [] };
+                }
+            });
+        });
+    </script>
+</body>
+</html>

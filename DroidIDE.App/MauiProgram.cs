@@ -2,6 +2,10 @@
 using DroidIDE.App.ViewModels;
 using DroidIDE.App.Views.Shell;
 using DroidIDE.Core.Interfaces;
+using DroidIDE.Editor.Diagnostics;
+using DroidIDE.Editor.LanguageServer;
+using DroidIDE.Editor.Monaco;
+using DroidIDE.Editor.Refactoring;
 using DroidIDE.Infrastructure.FileSystem;
 using DroidIDE.Infrastructure.Process;
 using DroidIDE.ProjectSystem.ProjectParser;
@@ -43,6 +47,12 @@ public static class MauiProgram
         builder.Services.AddSingleton<BuildService>();
         builder.Services.AddSingleton<RunService>();
         builder.Services.AddSingleton<ServiceManager>();
+
+        // ── Editor Services ──
+        builder.Services.AddSingleton<MonacoEditorBridge>();
+        builder.Services.AddSingleton<RoslynLanguageService>();
+        builder.Services.AddSingleton<DiagnosticService>();
+        builder.Services.AddSingleton<RefactoringService>();
 
         // ── App Services ──
         builder.Services.AddSingleton<IEditorService, EditorService>();
