@@ -49,6 +49,7 @@ DroidIDE/
 
 | Document | Description |
 |----------|------------|
+| [ANDROID_SETUP.md](ANDROID_SETUP.md) | **Step-by-step process to install .NET SDK on Android** |
 | [ARCHITECTURE.md](ARCHITECTURE.md) | System architecture, dependency diagram, design principles |
 | [LAYERS.md](LAYERS.md) | Overview of all 8 projects and their responsibilities |
 | [CORE_LAYER.md](CORE_LAYER.md) | Domain models, interfaces, enums, constants |

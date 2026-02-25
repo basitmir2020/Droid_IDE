@@ -27,9 +27,60 @@ public class LinuxEnvironmentManager
         SetVariable("DOTNET_CLI_TELEMETRY_OPTOUT", "1");
         SetVariable("DOTNET_NOLOGO", "1");
 
+        // FIX: 0x8007000E memory error on Android/proot
+        // Limit GC heap to ~448MB (1C000000 in hex)
+        SetVariable("DOTNET_GCHeapHardLimit", "1C000000");
+        
+        // FIX: Missing ICU/globalization in restricted environments
+        SetVariable("DOTNET_SYSTEM_GLOBALIZATION_INVARIANT", "1");
+
         // Prepend dotnet to PATH
         var currentPath = Environment.GetEnvironmentVariable("PATH") ?? "";
-        SetVariable("PATH", $"{dotnetSdkPath}:{currentPath}");
+        if (!currentPath.Contains(dotnetSdkPath))
+        {
+            SetVariable("PATH", $"{dotnetSdkPath}:{currentPath}");
+        }
+    }
+
+    /// <summary>
+    /// Attempts to find the .NET SDK root directory by checking common Android/Termux locations.
+    /// </summary>
+    /// <returns>The detected SDK root path, or null if not found.</returns>
+    public string? AutoDetectDotnetRoot()
+    {
+        var candidates = new[]
+        {
+            "/data/data/com.termux/files/usr/lib/dotnet",
+            "/data/data/com.termux/files/home/.dotnet",
+            "/data/user/0/com.termux/files/usr/lib/dotnet",
+            // proot-distro ubuntu paths
+            "/data/data/com.termux/files/usr/var/lib/proot-distro/installed-rootfs/ubuntu/usr/lib/dotnet",
+            "/data/data/com.termux/files/usr/var/lib/proot-distro/installed-rootfs/ubuntu/usr/bin/dotnet",
+            "/data/user/0/com.companyname.droidide.app/files/dotnet",
+            "/data/data/com.companyname.droidide.app/files/dotnet",
+            "/usr/lib/dotnet",
+            "/usr/local/lib/dotnet",
+            "/opt/dotnet"
+        };
+
+        foreach (var path in candidates)
+        {
+            try
+            {
+                // Check if it's a directory containing 'dotnet' OR is the 'dotnet' file itself
+                if (Directory.Exists(path) && File.Exists(Path.Combine(path, "dotnet")))
+                    return path;
+
+                if (File.Exists(path) && path.EndsWith("dotnet"))
+                    return Path.GetDirectoryName(path);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                // Sandbox blocked us, skip this candidate
+            }
+        }
+
+        return null;
     }
 
     /// <summary>

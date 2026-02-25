@@ -59,7 +59,7 @@ public class DiagnosticService
                 var compilation = CSharpCompilation.Create(
                     "StandaloneDiagnosticAnalysis",
                     [syntaxTree],
-                    RoslynLanguageService.DefaultReferences,
+                    _languageService.References,
                     new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
 
                 return compilation.GetDiagnostics(cancellationToken);

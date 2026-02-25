@@ -40,9 +40,58 @@ public class DotnetCliService : IDotnetCli
         var diagnostics = new List<DiagnosticItem>();
         var outputLines = new List<string>();
 
+        var dotnetBinary = ResolveDotnetBinary();
+        if (!File.Exists(dotnetBinary) && dotnetBinary != "dotnet")
+        {
+            var errorLines = new List<string>
+            {
+                $"[ERROR] .NET SDK not found at: {dotnetBinary}",
+                "",
+                "💡 HOW TO GET .NET SDK ON ANDROID:",
+                "DroidIDE requires the .NET SDK via Termux User Repository (TUR).",
+                "1. Install Termux from F-Droid or GitHub.",
+                "2. Run these commands in Termux:",
+                "   pkg update && pkg upgrade",
+                "   pkg install tur-repo",
+                "   pkg install dotnet-sdk",
+                "3. Restart DroidIDE.",
+                "",
+                "Alternative: Use 'proot-distro' to install Ubuntu and then .NET inside it."
+            };
+            outputLines.AddRange(errorLines);
+            foreach (var line in errorLines) BuildOutputReceived?.Invoke(line);
+            return new BuildResult { Success = false, Status = BuildStatus.Failed, OutputLines = outputLines };
+        }
+
         var workingDir = Path.GetDirectoryName(projectPath) ?? ".";
-        var process = await _processManager.StartAsync(ResolveDotnetBinary(), $"build \"{projectPath}\" --no-restore",
-            workingDir, cancellationToken);
+        IRunningProcess process;
+        try
+        {
+            process = await _processManager.StartAsync(dotnetBinary, $"build \"{projectPath}\" --no-restore",
+                workingDir, cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            var errorLines = new List<string>
+            {
+                $"[ERROR] Failed to start 'dotnet' process: {ex.Message}",
+                "",
+                "💡 DroidIDE could not find or start the .NET SDK.",
+                "To fix this, please follow the installation guide below:",
+                "",
+                "1. Install Termux from F-Droid or GitHub.",
+                "2. Run these commands in Termux:",
+                "   pkg update && pkg upgrade",
+                "   pkg install tur-repo",
+                "   pkg install dotnet-sdk",
+                "3. Restart DroidIDE.",
+                "",
+                "Current attempted binary: " + dotnetBinary
+            };
+            outputLines.AddRange(errorLines);
+            foreach (var line in errorLines) BuildOutputReceived?.Invoke(line);
+            return new BuildResult { Success = false, Status = BuildStatus.Failed, OutputLines = outputLines };
+        }
 
         var tcs = new TaskCompletionSource<int>();
 
@@ -168,13 +217,29 @@ public class DotnetCliService : IDotnetCli
             "/data/data/com.termux/files/usr/bin/dotnet",
             "/data/data/com.termux/files/home/.dotnet/dotnet",
             "/data/user/0/com.termux/files/usr/bin/dotnet",
+            // proot-distro ubuntu/debian/distro paths
+            "/data/data/com.termux/files/usr/var/lib/proot-distro/installed-rootfs/ubuntu/usr/lib/dotnet/dotnet",
+            "/data/data/com.termux/files/usr/var/lib/proot-distro/installed-rootfs/ubuntu/usr/bin/dotnet",
+            "/data/data/com.termux/files/usr/var/lib/proot-distro/installed-rootfs/debian/usr/lib/dotnet/dotnet",
+            "/data/data/com.termux/files/usr/var/lib/proot-distro/installed-rootfs/debian/usr/bin/dotnet",
+            "/data/user/0/com.termux/files/usr/var/lib/proot-distro/installed-rootfs/ubuntu/usr/bin/dotnet",
             "/usr/bin/dotnet",
-            "/usr/local/bin/dotnet"
+            "/usr/lib/dotnet/dotnet",
+            "/usr/local/bin/dotnet",
+            "/usr/lib/dotnet/dotnet"
         };
 
         foreach (var path in termuxCandidates)
         {
-            if (File.Exists(path)) return path;
+            try
+            {
+                if (File.Exists(path)) return path;
+            }
+            catch (UnauthorizedAccessException)
+            {
+                // Permission Denied for this path
+                System.Diagnostics.Debug.WriteLine($"[DotnetCli] Permission Denied for path: {path}");
+            }
         }
 
         // 3. Bare name — works on Windows/macOS/Linux where dotnet is in PATH

@@ -114,7 +114,7 @@ public class BuildViewModel : BaseViewModel
                 return;
             }
 
-            var result = await _buildService.BuildAsync(csproj);
+            var result = await _buildService.RestoreAndBuildAsync(csproj);
             BuildStatus = result.Success ? "Succeeded" : "Failed";
         }
         catch (Exception ex)

@@ -23,14 +23,9 @@ public class RoslynLanguageService : IDisposable
     private readonly Dictionary<string, DocumentId> _documents = new();
 
     /// <summary>
-    /// Core BCL metadata references loaded from the running assembly for basic compilation support.
+    /// The collection of metadata references used by the background project.
     /// </summary>
-    internal static readonly MetadataReference[] DefaultReferences =
-    [
-        MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
-        MetadataReference.CreateFromFile(typeof(Console).Assembly.Location),
-        MetadataReference.CreateFromFile(typeof(Enumerable).Assembly.Location)
-    ];
+    public IEnumerable<MetadataReference> References { get; }
 
     /// <summary>
     /// Initializes a new instance of <see cref="RoslynLanguageService"/>, creating an in-memory
@@ -42,18 +37,67 @@ public class RoslynLanguageService : IDisposable
         _workspace = new AdhocWorkspace(host);
 
         _projectId = ProjectId.CreateNewId("DroidIDE_EditProject");
+        References = GetDefaultReferences();
+
         var projectInfo = ProjectInfo.Create(
             _projectId,
             VersionStamp.Default,
             "EditProject",
             "EditProject",
             LanguageNames.CSharp,
-            compilationOptions: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary),
+            compilationOptions: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
+                .WithUsings("System", "System.Collections.Generic", "System.Linq", "System.Threading.Tasks", "System.IO"),
             parseOptions: new CSharpParseOptions(LanguageVersion.Latest),
-            metadataReferences: DefaultReferences
+            metadataReferences: References
         );
 
         _workspace.AddProject(projectInfo);
+    }
+
+    private static List<MetadataReference> GetDefaultReferences()
+    {
+        var references = new List<MetadataReference>();
+        var assemblies = new[]
+        {
+            typeof(object).Assembly,
+            typeof(Console).Assembly,
+            typeof(System.Linq.Enumerable).Assembly,
+            typeof(System.ComponentModel.Component).Assembly,
+            typeof(System.Net.Http.HttpClient).Assembly
+        };
+
+        foreach (var assembly in assemblies)
+        {
+            try
+            {
+                if (!string.IsNullOrEmpty(assembly.Location))
+                {
+                    references.Add(MetadataReference.CreateFromFile(assembly.Location));
+                }
+                else
+                {
+                    // Fallback for Android/AOT where Location is empty
+                    var resourceName = assembly.GetName().Name + ".dll";
+                    using var stream = assembly.GetManifestResourceStream(resourceName);
+                    if (stream != null)
+                    {
+                        references.Add(MetadataReference.CreateFromStream(stream));
+                    }
+                    else
+                    {
+                        // Last resort: unsafe but often works for BCL in MAUI
+                        // Note: This is a placeholder for more advanced assembly resolution if needed
+                        System.Diagnostics.Debug.WriteLine($"[Roslyn] Could not load reference for {assembly.FullName}");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[Roslyn] Reference error for {assembly.FullName}: {ex.Message}");
+            }
+        }
+
+        return references;
     }
 
     /// <summary>

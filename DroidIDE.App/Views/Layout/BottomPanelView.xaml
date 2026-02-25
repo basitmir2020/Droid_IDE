@@ -23,21 +23,27 @@
 
             <!-- Terminal Tab -->
             <Border Padding="10,6" Stroke="Transparent" StrokeShape="RoundRectangle 0">
-                <Border.BackgroundColor>
-                    <Binding Path="ActiveBottomTab"
-                             Converter="{StaticResource StringEqualsConverter}"
-                             ConverterParameter="Terminal">
-                        <Binding.FallbackValue>#1E1E1E</Binding.FallbackValue>
-                    </Binding>
-                </Border.BackgroundColor>
+                <Border.Style>
+                    <Style TargetType="Border">
+                        <Setter Property="BackgroundColor" Value="Transparent" />
+                        <Style.Triggers>
+                            <DataTrigger TargetType="Border" Binding="{Binding ActiveBottomTab}" Value="Terminal">
+                                <Setter Property="BackgroundColor" Value="#1E1E1E" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
                 <Label Text="TERMINAL" FontSize="11" FontAttributes="Bold">
-                    <Label.TextColor>
-                        <Binding Path="ActiveBottomTab"
-                                 Converter="{StaticResource StringEqualsConverter}"
-                                 ConverterParameter="Terminal">
-                            <Binding.FallbackValue>#FFFFFF</Binding.FallbackValue>
-                        </Binding>
-                    </Label.TextColor>
+                    <Label.Style>
+                        <Style TargetType="Label">
+                            <Setter Property="TextColor" Value="#888888" />
+                            <Style.Triggers>
+                                <DataTrigger TargetType="Label" Binding="{Binding ActiveBottomTab}" Value="Terminal">
+                                    <Setter Property="TextColor" Value="#FFFFFF" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Label.Style>
                     <Label.GestureRecognizers>
                         <TapGestureRecognizer Command="{Binding SwitchBottomTabCommand}" CommandParameter="Terminal"/>
                     </Label.GestureRecognizers>
@@ -46,21 +52,27 @@
 
             <!-- Output Tab (Build / Run output) -->
             <Border Padding="10,6" Stroke="Transparent" StrokeShape="RoundRectangle 0">
-                <Border.BackgroundColor>
-                    <Binding Path="ActiveBottomTab"
-                             Converter="{StaticResource StringEqualsConverter}"
-                             ConverterParameter="Output">
-                        <Binding.FallbackValue>#1E1E1E</Binding.FallbackValue>
-                    </Binding>
-                </Border.BackgroundColor>
+                <Border.Style>
+                    <Style TargetType="Border">
+                        <Setter Property="BackgroundColor" Value="Transparent" />
+                        <Style.Triggers>
+                            <DataTrigger TargetType="Border" Binding="{Binding ActiveBottomTab}" Value="Output">
+                                <Setter Property="BackgroundColor" Value="#1E1E1E" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
                 <Label Text="OUTPUT" FontSize="11" FontAttributes="Bold">
-                    <Label.TextColor>
-                        <Binding Path="ActiveBottomTab"
-                                 Converter="{StaticResource StringEqualsConverter}"
-                                 ConverterParameter="Output">
-                            <Binding.FallbackValue>#888888</Binding.FallbackValue>
-                        </Binding>
-                    </Label.TextColor>
+                    <Label.Style>
+                        <Style TargetType="Label">
+                            <Setter Property="TextColor" Value="#888888" />
+                            <Style.Triggers>
+                                <DataTrigger TargetType="Label" Binding="{Binding ActiveBottomTab}" Value="Output">
+                                    <Setter Property="TextColor" Value="#FFFFFF" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Label.Style>
                     <Label.GestureRecognizers>
                         <TapGestureRecognizer Command="{Binding SwitchBottomTabCommand}" CommandParameter="Output"/>
                     </Label.GestureRecognizers>
