@@ -4,6 +4,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:DroidIDE.App.ViewModels"
              xmlns:editor="clr-namespace:DroidIDE.App.Views.Editor"
+             xmlns:layout="clr-namespace:DroidIDE.App.Views.Layout"
              x:Class="DroidIDE.App.Views.Layout.EditorHostView"
              x:DataType="vm:EditorViewModel"
              BackgroundColor="#1E1E1E">
@@ -13,22 +14,10 @@
         <editor:MonacoEditorView x:Name="MonacoEditor"
                                   IsVisible="{Binding ActiveTab, Converter={StaticResource IsNotNullConverter}}"/>
 
-        <!-- Empty state when no tab is open -->
-        <VerticalStackLayout VerticalOptions="Center"
-                             HorizontalOptions="Center"
-                             IsVisible="{Binding ActiveTab, Converter={StaticResource IsNullConverter}}">
-
-            <Label Text="DroidIDE"
-                   TextColor="#555555"
-                   FontSize="36"
-                   FontAttributes="Bold"
-                   HorizontalOptions="Center"/>
-
-            <Label Text="Open a file from the Explorer to start editing"
-                   TextColor="#555555"
-                   FontSize="14"
-                   HorizontalOptions="Center"
-                   Margin="0,8,0,0"/>
-        </VerticalStackLayout>
+        <!-- Empty state when no tab is open (Welcome View) -->
+        <layout:WelcomeView VerticalOptions="FillAndExpand"
+                            HorizontalOptions="FillAndExpand"
+                            IsVisible="{Binding ActiveTab, Converter={StaticResource IsNullConverter}}"
+                            BindingContext="{Binding Source={RelativeSource AncestorType={x:Type vm:MainShellViewModel}}}"/>
     </Grid>
 </ContentView>

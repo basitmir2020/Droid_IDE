@@ -63,19 +63,16 @@
             </CollectionView.ItemTemplate>
 
             <CollectionView.EmptyView>
-                <VerticalStackLayout VerticalOptions="Center"
-                                     HorizontalOptions="Center"
-                                     Padding="20">
-                    <Label Text="No folder opened"
-                           TextColor="#888888"
-                           FontSize="13"
-                           HorizontalOptions="Center"/>
-                    <Label Text="Open a folder to get started"
-                           TextColor="#666666"
-                           FontSize="11"
-                           HorizontalOptions="Center"
-                           Margin="0,4,0,0"/>
-                </VerticalStackLayout>
+                <Label Text="No folder opened&#x0a;Open a folder to get started"
+                       TextColor="#666666"
+                       FontSize="13"
+                       HorizontalTextAlignment="Center"
+                       VerticalOptions="Center"
+                       Padding="20">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding OpenFolderCommand}"/>
+                    </Label.GestureRecognizers>
+                </Label>
             </CollectionView.EmptyView>
 
         </CollectionView>

@@ -50,7 +50,7 @@ public class ExplorerViewModel : BaseViewModel
         Title = "Explorer";
 
         RefreshCommand = new AsyncRelayCommand(LoadFilesAsync);
-        OpenFolderCommand = new AsyncRelayCommand(OpenFolderAsync);
+        OpenFolderCommand = new AsyncRelayCommand(PickAndOpenFolderAsync);
     }
 
     /// <summary>
@@ -86,10 +86,32 @@ public class ExplorerViewModel : BaseViewModel
         await LoadFilesAsync();
     }
 
-    private async Task OpenFolderAsync()
+    /// <summary>
+    /// Opens a file picker and uses the selected file's parent directory as the project folder.
+    /// This approach works across all platforms without requiring CommunityToolkit.Maui.
+    /// </summary>
+    private async Task PickAndOpenFolderAsync()
     {
-        // Placeholder — in production, this would show a folder picker dialog
-        await Task.CompletedTask;
+        try
+        {
+            var fileResult = await FilePicker.PickAsync(new PickOptions
+            {
+                PickerTitle = "Select any file inside the folder you want to open"
+            });
+
+            if (fileResult != null)
+            {
+                var directoryPath = Path.GetDirectoryName(fileResult.FullPath);
+                if (!string.IsNullOrEmpty(directoryPath))
+                {
+                    await OpenFolderAsync(directoryPath);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"FilePicker failed: {ex.Message}");
+        }
     }
 
     private async Task OpenFileAsync(FileItem fileItem)

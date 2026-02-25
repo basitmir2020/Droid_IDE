@@ -20,8 +20,8 @@
 
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="48"/>
-                <ColumnDefinition x:Name="ExplorerColumn" Width="260"/>
-                <ColumnDefinition Width="6"/>   <!-- Vertical Splitter -->
+                <ColumnDefinition x:Name="SidebarColumn" Width="260"/>
+                <ColumnDefinition x:Name="SplitterColumn" Width="6"/>   <!-- Vertical Splitter -->
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
@@ -29,10 +29,27 @@
             <layout:ActivityBarView Grid.Column="0"
                                     BindingContext="{Binding}"/>
 
-            <!-- Explorer — binds to ExplorerViewModel -->
+            <!-- Sidebar Panel Container (column 1) — switches based on ActivePanel -->
+
+            <!-- Explorer Panel -->
             <layout:ExplorerView Grid.Column="1"
                                  BindingContext="{Binding Explorer}"
-                                 IsVisible="{Binding IsExplorerVisible}"/>
+                                 IsVisible="{Binding ActivePanel, Converter={StaticResource StringEqualsConverter}, ConverterParameter=Explorer}"/>
+
+            <!-- Search Panel -->
+            <layout:SearchPanelView Grid.Column="1"
+                                    BindingContext="{Binding Search}"
+                                    IsVisible="{Binding ActivePanel, Converter={StaticResource StringEqualsConverter}, ConverterParameter=Search}"/>
+
+            <!-- Git / Source Control Panel -->
+            <layout:GitPanelView Grid.Column="1"
+                                 BindingContext="{Binding Git}"
+                                 IsVisible="{Binding ActivePanel, Converter={StaticResource StringEqualsConverter}, ConverterParameter=Git}"/>
+
+            <!-- Settings Panel -->
+            <layout:SettingsView Grid.Column="1"
+                                 BindingContext="{Binding Settings}"
+                                 IsVisible="{Binding ActivePanel, Converter={StaticResource StringEqualsConverter}, ConverterParameter=Settings}"/>
 
             <!-- Vertical Splitter -->
             <BoxView x:Name="VerticalSplitter"
@@ -55,7 +72,8 @@
                                        BindingContext="{Binding Editor}"/>
 
                 <!-- Editor Host — binds to EditorViewModel -->
-                <layout:EditorHostView Grid.Row="1"
+                <layout:EditorHostView x:Name="EditorHost"
+                                       Grid.Row="1"
                                        BindingContext="{Binding Editor}"/>
 
                 <!-- Horizontal Splitter -->

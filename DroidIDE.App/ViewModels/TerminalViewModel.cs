@@ -33,10 +33,19 @@ public class TerminalViewModel : BaseViewModel
         set => SetProperty(ref _commandInput, value);
     }
 
+    private string _activeBottomTab = "Terminal";
+    /// <summary>Gets or sets the active bottom panel tab (Terminal, Output, or Problems).</summary>
+    public string ActiveBottomTab
+    {
+        get => _activeBottomTab;
+        set => SetProperty(ref _activeBottomTab, value);
+    }
+
     public ICommand SendCommandCommand { get; }
     public ICommand NewSessionCommand { get; }
     public ICommand CloseSessionCommand { get; }
     public ICommand ClearOutputCommand { get; }
+    public ICommand SwitchBottomTabCommand { get; }
 
     public TerminalViewModel(ITerminalService terminalService)
     {
@@ -47,6 +56,11 @@ public class TerminalViewModel : BaseViewModel
         NewSessionCommand = new AsyncRelayCommand(CreateSessionAsync);
         CloseSessionCommand = new AsyncRelayCommand(CloseActiveSessionAsync);
         ClearOutputCommand = new RelayCommand(ClearOutput);
+        SwitchBottomTabCommand = new RelayCommand(param =>
+        {
+            if (param is string tabName)
+                ActiveBottomTab = tabName;
+        });
 
         // Listen for real-time output
         _terminalService.OutputReceived += OnOutputReceived;

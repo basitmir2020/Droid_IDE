@@ -21,30 +21,51 @@
             Padding="10,0"
             Spacing="4">
 
-            <Border BackgroundColor="#1E1E1E"
-                    Stroke="Transparent"
-                    StrokeShape="RoundRectangle 0"
-                    Padding="10,6">
+            <!-- Terminal Tab -->
+            <Border Padding="10,6" Stroke="Transparent" StrokeShape="RoundRectangle 0">
+                <Border.BackgroundColor>
+                    <Binding Path="ActiveBottomTab"
+                             Converter="{StaticResource StringEqualsConverter}"
+                             ConverterParameter="Terminal">
+                        <Binding.FallbackValue>#1E1E1E</Binding.FallbackValue>
+                    </Binding>
+                </Border.BackgroundColor>
                 <Label Text="TERMINAL"
-                       TextColor="#FFFFFF"
                        FontSize="11"
-                       FontAttributes="Bold"/>
+                       FontAttributes="Bold">
+                    <Label.TextColor>
+                        <Binding Path="ActiveBottomTab"
+                                 Converter="{StaticResource StringEqualsConverter}"
+                                 ConverterParameter="Terminal">
+                            <Binding.FallbackValue>#FFFFFF</Binding.FallbackValue>
+                        </Binding>
+                    </Label.TextColor>
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding SwitchBottomTabCommand}" CommandParameter="Terminal"/>
+                    </Label.GestureRecognizers>
+                </Label>
             </Border>
 
-            <Border BackgroundColor="Transparent"
-                    Stroke="Transparent"
-                    Padding="10,6">
+            <!-- Output Tab -->
+            <Border BackgroundColor="Transparent" Stroke="Transparent" Padding="10,6">
                 <Label Text="OUTPUT"
                        TextColor="#888888"
-                       FontSize="11"/>
+                       FontSize="11">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding SwitchBottomTabCommand}" CommandParameter="Output"/>
+                    </Label.GestureRecognizers>
+                </Label>
             </Border>
 
-            <Border BackgroundColor="Transparent"
-                    Stroke="Transparent"
-                    Padding="10,6">
+            <!-- Problems Tab -->
+            <Border BackgroundColor="Transparent" Stroke="Transparent" Padding="10,6">
                 <Label Text="PROBLEMS"
                        TextColor="#888888"
-                       FontSize="11"/>
+                       FontSize="11">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding SwitchBottomTabCommand}" CommandParameter="Problems"/>
+                    </Label.GestureRecognizers>
+                </Label>
             </Border>
 
             <!-- Spacer -->

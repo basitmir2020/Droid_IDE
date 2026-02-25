@@ -21,6 +21,7 @@
             <converters:IsNotNullConverter x:Key="IsNotNullConverter"/>
             <converters:IsNullConverter x:Key="IsNullConverter"/>
             <converters:InverseBoolConverter x:Key="InverseBoolConverter"/>
+            <converters:StringEqualsConverter x:Key="StringEqualsConverter"/>
         </ResourceDictionary>
     </Application.Resources>
 </Application>
