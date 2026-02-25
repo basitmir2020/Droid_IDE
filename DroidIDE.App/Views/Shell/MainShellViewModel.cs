@@ -132,30 +132,13 @@ public class MainShellViewModel : BaseViewModel
             var page = Application.Current?.MainPage;
             if (page is null) return;
 
-            // ── Check .NET SDK is installed first ──────────────────
-            var sdkAvailable = await _dotnetCli.IsAvailableAsync();
-            if (!sdkAvailable)
-            {
-                await page.DisplayAlert(
-                    ".NET SDK Not Found",
-                    "The dotnet CLI was not found on this device.\n\n" +
-                    "To use Build/Run features, install .NET SDK via Termux:\n\n" +
-                    "1. Install Termux from F-Droid\n" +
-                    "2. Run: pkg install wget\n" +
-                    "3. Run: wget https://dot.net/v1/dotnet-install.sh\n" +
-                    "4. Run: bash dotnet-install.sh --channel 9.0\n\n" +
-                    "Then restart DroidIDE.",
-                    "OK");
-                return;
-            }
-
             var template = await page.DisplayActionSheet("Select Project Template", "Cancel", null, "console", "classlib", "webapi", "maui");
             if (template == "Cancel" || string.IsNullOrEmpty(template)) return;
 
             var name = await page.DisplayPromptAsync("New Project", "Enter project name:", "Create", "Cancel", "MyProject");
             if (string.IsNullOrEmpty(name)) return;
 
-            // Auto-select default projects directory — no folder picker needed
+            // Auto-select default projects directory
             var projectsRoot = Path.Combine(FileSystem.AppDataDirectory, "Projects");
             Directory.CreateDirectory(projectsRoot);
             var projectPath = Path.Combine(projectsRoot, name);
@@ -164,12 +147,32 @@ public class MainShellViewModel : BaseViewModel
             {
                 IsBusy = true;
                 StatusText = $"Creating {template} project '{name}'...";
-                await _dotnetCli.NewAsync(template, projectsRoot, name);
+
+                // Create project files directly — no dotnet CLI needed
+                await Task.Run(() => Services.ProjectScaffolder.Create(template, projectPath, name));
 
                 await _explorerViewModel.OpenFolderAsync(projectPath);
+                
+                // Ensure sidebar is visible and active
+                ActivePanel = "Explorer";
+                IsExplorerVisible = true;
+
+                // Automatically open the main file to show the project is "opened"
+                string mainFile = template.ToLowerInvariant() switch
+                {
+                    "console" or "webapi" or "maui" => "Program.cs",
+                    "classlib" => "Class1.cs",
+                    _ => "Program.cs"
+                };
+                var mainFilePath = Path.Combine(projectPath, mainFile);
+                if (File.Exists(mainFilePath))
+                {
+                    await _editorViewModel.OpenFileForEditorAsync(mainFilePath);
+                }
+
                 _ = _gitViewModel.InitializeAsync(projectPath);
                 _buildViewModel.SetProjectPath(projectPath);
-                StatusText = $"Project '{name}' created at {projectPath}";
+                StatusText = $"Project '{name}' opened";
             }
             catch (Exception ex)
             {
