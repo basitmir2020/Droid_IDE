@@ -83,6 +83,16 @@ public class MainShellViewModel : BaseViewModel
         _gitService         = gitService;
         _dotnetCli          = dotnetCli;
 
+        // Automatically show Output panel when build/run starts
+        _buildViewModel.BuildStarted += () =>
+        {
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                IsBottomPanelVisible = true;
+                _terminalViewModel.ActiveBottomTab = "Output";
+            });
+        };
+
         Title = "DroidIDE";
 
         ToggleExplorerCommand = new RelayCommand(() => IsExplorerVisible = !IsExplorerVisible);
@@ -193,15 +203,18 @@ public class MainShellViewModel : BaseViewModel
         {
             if (param is string panelName)
             {
-                // If tapping the same panel, toggle sidebar visibility
-                if (ActivePanel == panelName && IsExplorerVisible)
+                MainThread.BeginInvokeOnMainThread(() =>
                 {
-                    IsExplorerVisible = false;
-                    return;
-                }
+                    // If tapping the same panel, toggle sidebar visibility
+                    if (ActivePanel == panelName && IsExplorerVisible)
+                    {
+                        IsExplorerVisible = false;
+                        return;
+                    }
 
-                ActivePanel = panelName;
-                IsExplorerVisible = true;
+                    ActivePanel = panelName;
+                    IsExplorerVisible = true;
+                });
             }
         });
 

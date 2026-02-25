@@ -21,9 +21,16 @@ public class ExplorerViewModel : BaseViewModel
         get => _selectedItem;
         set
         {
-            if (SetProperty(ref _selectedItem, value) && value is not null && !value.IsDirectory)
+            if (SetProperty(ref _selectedItem, value) && value is not null)
             {
-                _ = OpenFileAsync(value);
+                if (value.IsDirectory)
+                {
+                    _ = OpenFolderAsync(value.FullPath);
+                }
+                else
+                {
+                    _ = OpenFileAsync(value);
+                }
             }
         }
     }
@@ -41,6 +48,7 @@ public class ExplorerViewModel : BaseViewModel
     public ICommand CreateFolderCommand { get; }
     public ICommand RenameCommand { get; }
     public ICommand DeleteCommand { get; }
+    public ICommand NavigateUpCommand { get; }
 
     /// <summary>
     /// Event raised when a file should be opened in the editor.
@@ -59,6 +67,7 @@ public class ExplorerViewModel : BaseViewModel
         CreateFolderCommand = new AsyncRelayCommand<FileItem>(CreateFolderAsync);
         RenameCommand = new AsyncRelayCommand<FileItem>(RenameAsync);
         DeleteCommand = new AsyncRelayCommand<FileItem>(DeleteAsync);
+        NavigateUpCommand = new AsyncRelayCommand(NavigateUpAsync);
     }
 
     /// <summary>
@@ -92,6 +101,17 @@ public class ExplorerViewModel : BaseViewModel
     {
         CurrentPath = folderPath;
         await LoadFilesAsync();
+    }
+
+    private async Task NavigateUpAsync()
+    {
+        if (string.IsNullOrEmpty(CurrentPath)) return;
+
+        var parent = Path.GetDirectoryName(CurrentPath);
+        if (!string.IsNullOrEmpty(parent))
+        {
+            await OpenFolderAsync(parent);
+        }
     }
 
     /// <summary>

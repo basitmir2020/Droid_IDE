@@ -27,7 +27,7 @@ public class FileSystemService : IFileSystemService
     }
 
     /// <inheritdoc />
-    /// <remarks>Returns directories first, then files, both sorted alphabetically by name.</remarks>
+    /// <remarks>Returns directories first, then files, both sorted alphabetically by name. Uses single-pass enumeration for performance.</remarks>
     public Task<List<FileItem>> ListDirectoryAsync(string path)
     {
         var items = new List<FileItem>();
@@ -35,37 +35,47 @@ public class FileSystemService : IFileSystemService
         if (!Directory.Exists(path))
             return Task.FromResult(items);
 
-        // Directories first, then files, both alphabetically sorted
-        foreach (var dir in Directory.GetDirectories(path).OrderBy(d => Path.GetFileName(d)))
+        try
         {
-            items.Add(new FileItem
+            var dirInfo = new DirectoryInfo(path);
+            
+            // Single pass enumeration is faster than calling GetDirectories and GetFiles separately
+            foreach (var info in dirInfo.EnumerateFileSystemInfos().OrderBy(i => i is not DirectoryInfo).ThenBy(i => i.Name))
             {
-                Name = Path.GetFileName(dir),
-                FullPath = dir,
-                IsDirectory = true,
-                LastModified = Directory.GetLastWriteTimeUtc(dir)
-            });
+                if (info is DirectoryInfo di)
+                {
+                    items.Add(new FileItem
+                    {
+                        Name = di.Name,
+                        FullPath = di.FullName,
+                        IsDirectory = true,
+                        LastModified = di.LastWriteTimeUtc
+                    });
+                }
+                else if (info is FileInfo fi)
+                {
+                    items.Add(new FileItem
+                    {
+                        Name = fi.Name,
+                        FullPath = fi.FullName,
+                        IsDirectory = false,
+                        Extension = fi.Extension,
+                        SizeBytes = fi.Length,
+                        LastModified = fi.LastWriteTimeUtc
+                    });
+                }
+            }
         }
-
-        foreach (var file in Directory.GetFiles(path).OrderBy(f => Path.GetFileName(f)))
+        catch (Exception ex)
         {
-            var info = new FileInfo(file);
-            items.Add(new FileItem
-            {
-                Name = info.Name,
-                FullPath = info.FullName,
-                IsDirectory = false,
-                Extension = info.Extension,
-                SizeBytes = info.Length,
-                LastModified = info.LastWriteTimeUtc
-            });
+            System.Diagnostics.Debug.WriteLine($"[FileSystemService] ListDirectoryAsync failed: {ex.Message}");
         }
 
         return Task.FromResult(items);
     }
 
     /// <inheritdoc />
-    /// <remarks>Recursively populates the tree up to a depth of 5 levels to avoid scanning excessively deep trees.</remarks>
+    /// <remarks>Optimized: Now creates a shallow tree (depth 1) to support efficient drill-down explorer navigation.</remarks>
     public async Task<FileItem> GetFileTreeAsync(string rootPath)
     {
         var rootName = Path.GetFileName(rootPath);
@@ -80,7 +90,8 @@ public class FileSystemService : IFileSystemService
             IsExpanded = true
         };
 
-        await PopulateChildrenAsync(root, maxDepth: 5);
+        // For drill-down navigation, we only need the immediate children of the root path being opened.
+        await PopulateChildrenAsync(root, maxDepth: 1);
         return root;
     }
 
@@ -98,6 +109,8 @@ public class FileSystemService : IFileSystemService
         var children = await ListDirectoryAsync(parent.FullPath);
         parent.Children = children;
 
+        // Recursively populate children if we haven't reached maxDepth.
+        // For maxDepth=1 (shallow), this loop won't execute further PopulateChildrenAsync calls.
         foreach (var child in children.Where(c => c.IsDirectory))
         {
             await PopulateChildrenAsync(child, maxDepth, currentDepth + 1);

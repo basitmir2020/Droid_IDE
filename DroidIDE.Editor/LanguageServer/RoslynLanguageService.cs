@@ -25,7 +25,7 @@ public class RoslynLanguageService : IDisposable
     /// <summary>
     /// Core BCL metadata references loaded from the running assembly for basic compilation support.
     /// </summary>
-    private static readonly MetadataReference[] DefaultReferences =
+    internal static readonly MetadataReference[] DefaultReferences =
     [
         MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
         MetadataReference.CreateFromFile(typeof(Console).Assembly.Location),
@@ -260,6 +260,28 @@ public class RoslynLanguageService : IDisposable
         }
 
         return results;
+    }
+
+    /// <summary>
+    /// Gets compiler diagnostics for the specified document from the current workspace compilation.
+    /// </summary>
+    /// <param name="filePath">The file path of the document to analyze.</param>
+    /// <param name="cancellationToken">Token to cancel the diagnostic retrieval.</param>
+    /// <returns>A collection of Roslyn diagnostics.</returns>
+    public async Task<ImmutableArray<Diagnostic>> GetDiagnosticsAsync(string filePath, CancellationToken cancellationToken = default)
+    {
+        if (!_documents.TryGetValue(filePath, out var docId))
+            return ImmutableArray<Diagnostic>.Empty;
+
+        var document = _workspace.CurrentSolution.GetDocument(docId);
+        if (document is null) return ImmutableArray<Diagnostic>.Empty;
+
+        var compilation = await document.Project.GetCompilationAsync(cancellationToken);
+        if (compilation is null) return ImmutableArray<Diagnostic>.Empty;
+
+        // Note: This gets all diagnostics for the file, which is more efficient 
+        // than rebuilding the compilation in another service.
+        return compilation.GetDiagnostics(cancellationToken);
     }
 
     /// <summary>

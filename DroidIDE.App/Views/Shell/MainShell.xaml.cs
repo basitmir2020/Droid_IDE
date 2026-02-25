@@ -116,14 +116,5 @@ public partial class MainShell : ContentPage
         HorizontalSplitter.GestureRecognizers.Add(panGesture);
     }
     
-    protected override void OnSizeAllocated(double width, double height)
-    {
-        base.OnSizeAllocated(width, height);
 
-        if (width < 800)
-        {
-            // Auto-hide sidebar on narrow screens
-            _viewModel.IsExplorerVisible = false;
-        }
-    }
 }

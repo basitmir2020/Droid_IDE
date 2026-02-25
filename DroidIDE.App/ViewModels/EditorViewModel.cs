@@ -19,6 +19,8 @@ public class EditorViewModel : BaseViewModel
     private readonly RoslynLanguageService _languageService;
     private readonly MonacoEditorBridge _bridge;
 
+    private CancellationTokenSource? _diagnosticsCts;
+
     /// <summary>Currently open editor tabs.</summary>
     public ObservableCollection<EditorTab> OpenTabs { get; } = [];
 
@@ -259,13 +261,26 @@ public class EditorViewModel : BaseViewModel
 
     /// <summary>
     /// Runs Roslyn diagnostics for a C# tab on a background thread.
+    /// Cancels any existing diagnostic tasks for this editor.
     /// </summary>
     private async Task RunDiagnosticsAsync(EditorTab tab)
     {
+        // Cancel existing diagnostics task
+        _diagnosticsCts?.Cancel();
+        _diagnosticsCts = new CancellationTokenSource();
+        var token = _diagnosticsCts.Token;
+
         try
         {
+            // Optional: short internal debounce to avoid overwhelming on very fast bridge updates
+            await Task.Delay(100, token);
+
             // AnalyzeAsync fires DiagnosticsUpdated when complete
-            await _diagnosticService.AnalyzeAsync(tab.FilePath, tab.Content);
+            await _diagnosticService.AnalyzeAsync(tab.FilePath, tab.Content, token);
+        }
+        catch (TaskCanceledException)
+        {
+            // Normal when typing fast
         }
         catch (Exception ex)
         {

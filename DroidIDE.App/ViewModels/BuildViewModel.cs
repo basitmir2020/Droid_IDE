@@ -21,6 +21,9 @@ public class BuildViewModel : BaseViewModel
     /// <summary>Streamed output from build and run operations.</summary>
     public ObservableCollection<string> BuildOutput { get; } = [];
 
+    /// <summary>Raised when a build, run, or clean operation starts.</summary>
+    public event Action? BuildStarted;
+
     /// <summary>Current status text (Ready / Building / Running / Failed / Success).</summary>
     public string BuildStatus
     {
@@ -97,6 +100,7 @@ public class BuildViewModel : BaseViewModel
 
         IsRunning = true;
         BuildStatus = "Building";
+        BuildStarted?.Invoke();
         AppendLine($"── Building {Path.GetFileName(_currentProjectPath!)} ──");
 
         try
@@ -137,6 +141,7 @@ public class BuildViewModel : BaseViewModel
 
         IsRunning = true;
         BuildStatus = "Running";
+        BuildStarted?.Invoke();
         AppendLine($"\n── Running {Path.GetFileName(csproj)} ──");
 
         try
@@ -165,6 +170,7 @@ public class BuildViewModel : BaseViewModel
 
         IsRunning = true;
         BuildStatus = "Cleaning";
+        BuildStarted?.Invoke();
         AppendLine($"── Cleaning ──");
 
         try
