@@ -15,8 +15,8 @@
                                   IsVisible="{Binding ActiveTab, Converter={StaticResource IsNotNullConverter}}"/>
 
         <!-- Empty state when no tab is open (Welcome View) -->
-        <layout:WelcomeView VerticalOptions="FillAndExpand"
-                            HorizontalOptions="FillAndExpand"
+        <layout:WelcomeView VerticalOptions="Fill"
+                            HorizontalOptions="Fill"
                             IsVisible="{Binding ActiveTab, Converter={StaticResource IsNullConverter}}"
                             BindingContext="{Binding Source={RelativeSource AncestorType={x:Type vm:MainShellViewModel}}}"/>
     </Grid>

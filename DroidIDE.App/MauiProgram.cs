@@ -84,6 +84,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<SearchViewModel>();
         builder.Services.AddSingleton<GitViewModel>();
         builder.Services.AddSingleton<SettingsViewModel>();
+        builder.Services.AddSingleton<BuildViewModel>();
 
         // ── Pages / Views ──
         builder.Services.AddSingleton<MainShell>();

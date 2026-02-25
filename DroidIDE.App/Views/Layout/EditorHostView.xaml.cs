@@ -28,6 +28,13 @@ public partial class EditorHostView : ContentView
 
         // Listen for content changes from Monaco → ViewModel
         bridge.ContentChanged += OnMonacoContentChanged;
+
+        // Wire IntelliSense: completion requests from Monaco → Roslyn → back to Monaco
+        MonacoEditor.CompletionRequested += caretOffset =>
+        {
+            if (_viewModel is not null)
+                _ = _viewModel.ProvideCompletionsAsync(caretOffset);
+        };
     }
 
     private void OnBindingContextChanged(object? sender, EventArgs e)

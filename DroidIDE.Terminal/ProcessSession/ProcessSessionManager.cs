@@ -40,8 +40,9 @@ public class ProcessSessionManager : ITerminalService
             WorkingDirectory = workingDirectory
         };
 
-        // Start a shell process (sh on Android/Linux)
-        var process = await _processManager.StartAsync("/system/bin/sh", "", workingDirectory);
+        // Select the correct shell binary for the current platform
+        var (shellBinary, shellArgs) = GetPlatformShell();
+        var process = await _processManager.StartAsync(shellBinary, shellArgs, workingDirectory);
 
         var processSession = new TerminalProcessSession(session, process);
 
@@ -102,6 +103,23 @@ public class ProcessSessionManager : ITerminalService
             await session.Process.KillAsync();
             await session.Process.DisposeAsync();
         }
+    }
+
+    /// <summary>
+    /// Returns the appropriate shell binary and launch arguments for the current platform.
+    /// </summary>
+    private static (string Binary, string Arguments) GetPlatformShell()
+    {
+#if ANDROID
+        return ("/system/bin/sh", "");
+#elif WINDOWS
+        return ("cmd.exe", "/K");
+#elif MACCATALYST || IOS
+        return ("/bin/zsh", "-i");
+#else
+        // Linux / fallback
+        return ("/bin/bash", "-i");
+#endif
     }
 }
 

@@ -15,6 +15,7 @@ public class MainShellViewModel : BaseViewModel
     private readonly SearchViewModel _searchViewModel;
     private readonly GitViewModel _gitViewModel;
     private readonly SettingsViewModel _settingsViewModel;
+    private readonly BuildViewModel _buildViewModel;
     private readonly IGitService _gitService;
     private readonly IDotnetCli _dotnetCli;
 
@@ -53,12 +54,13 @@ public class MainShellViewModel : BaseViewModel
     public ICommand CloneRepoCommand { get; }
     public ICommand NewProjectCommand { get; }
 
-    public ExplorerViewModel Explorer => _explorerViewModel;
-    public EditorViewModel Editor => _editorViewModel;
-    public TerminalViewModel Terminal => _terminalViewModel;
-    public SearchViewModel Search => _searchViewModel;
-    public GitViewModel Git => _gitViewModel;
-    public SettingsViewModel Settings => _settingsViewModel;
+    public ExplorerViewModel Explorer  => _explorerViewModel;
+    public EditorViewModel Editor      => _editorViewModel;
+    public TerminalViewModel Terminal  => _terminalViewModel;
+    public SearchViewModel Search      => _searchViewModel;
+    public GitViewModel Git            => _gitViewModel;
+    public SettingsViewModel Settings  => _settingsViewModel;
+    public BuildViewModel Build        => _buildViewModel;
 
     public MainShellViewModel(
         ExplorerViewModel explorerViewModel,
@@ -67,17 +69,19 @@ public class MainShellViewModel : BaseViewModel
         SearchViewModel searchViewModel,
         GitViewModel gitViewModel,
         SettingsViewModel settingsViewModel,
+        BuildViewModel buildViewModel,
         IGitService gitService,
         IDotnetCli dotnetCli)
     {
-        _explorerViewModel = explorerViewModel;
-        _editorViewModel = editorViewModel;
-        _terminalViewModel = terminalViewModel;
-        _searchViewModel = searchViewModel;
-        _gitViewModel = gitViewModel;
-        _settingsViewModel = settingsViewModel;
-        _gitService = gitService;
-        _dotnetCli = dotnetCli;
+        _explorerViewModel  = explorerViewModel;
+        _editorViewModel    = editorViewModel;
+        _terminalViewModel  = terminalViewModel;
+        _searchViewModel    = searchViewModel;
+        _gitViewModel       = gitViewModel;
+        _settingsViewModel  = settingsViewModel;
+        _buildViewModel     = buildViewModel;
+        _gitService         = gitService;
+        _dotnetCli          = dotnetCli;
 
         Title = "DroidIDE";
 
@@ -88,12 +92,15 @@ public class MainShellViewModel : BaseViewModel
         
         CloneRepoCommand = new AsyncRelayCommand(async () =>
         {
-            var url = await Shell.Current.DisplayPromptAsync("Clone Repository", "Enter Git repository URL:", "Clone", "Cancel", "https://github.com/...");
+            var page = Application.Current?.MainPage;
+            if (page is null) return;
+
+            var url = await page.DisplayPromptAsync("Clone Repository", "Enter Git repository URL:", "Clone", "Cancel", "https://github.com/...");
             if (string.IsNullOrEmpty(url)) return;
 
             StatusText = "Select target folder for clone...";
             var targetPath = await PickFolderAsync();
-            if (string.IsNullOrEmpty(targetPath)) 
+            if (string.IsNullOrEmpty(targetPath))
             {
                 StatusText = "Ready";
                 return;
@@ -105,11 +112,13 @@ public class MainShellViewModel : BaseViewModel
                 StatusText = $"Cloning {url}...";
                 await _gitService.CloneAsync(url, targetPath);
                 await _explorerViewModel.OpenFolderAsync(targetPath);
+                await _gitViewModel.InitializeAsync(targetPath);
+                _buildViewModel.SetProjectPath(targetPath);
                 StatusText = "Repository cloned successfully";
             }
             catch (Exception ex)
             {
-                await Shell.Current.DisplayAlert("Clone Failed", ex.Message, "OK");
+                await page.DisplayAlert("Clone Failed", ex.Message, "OK");
                 StatusText = "Clone failed";
             }
             finally
@@ -120,33 +129,51 @@ public class MainShellViewModel : BaseViewModel
 
         NewProjectCommand = new AsyncRelayCommand(async () =>
         {
-            var template = await Shell.Current.DisplayActionSheet("Select Project Template", "Cancel", null, "console", "classlib", "webapi", "maui");
-            if (template == "Cancel" || string.IsNullOrEmpty(template)) return;
+            var page = Application.Current?.MainPage;
+            if (page is null) return;
 
-            var name = await Shell.Current.DisplayPromptAsync("New Project", "Enter project name:", "Create", "Cancel", "MyProject");
-            if (string.IsNullOrEmpty(name)) return;
-
-            StatusText = "Select output folder...";
-            var targetPath = await PickFolderAsync();
-            if (string.IsNullOrEmpty(targetPath))
+            // ── Check .NET SDK is installed first ──────────────────
+            var sdkAvailable = await _dotnetCli.IsAvailableAsync();
+            if (!sdkAvailable)
             {
-                StatusText = "Ready";
+                await page.DisplayAlert(
+                    ".NET SDK Not Found",
+                    "The dotnet CLI was not found on this device.\n\n" +
+                    "To use Build/Run features, install .NET SDK via Termux:\n\n" +
+                    "1. Install Termux from F-Droid\n" +
+                    "2. Run: pkg install wget\n" +
+                    "3. Run: wget https://dot.net/v1/dotnet-install.sh\n" +
+                    "4. Run: bash dotnet-install.sh --channel 9.0\n\n" +
+                    "Then restart DroidIDE.",
+                    "OK");
                 return;
             }
+
+            var template = await page.DisplayActionSheet("Select Project Template", "Cancel", null, "console", "classlib", "webapi", "maui");
+            if (template == "Cancel" || string.IsNullOrEmpty(template)) return;
+
+            var name = await page.DisplayPromptAsync("New Project", "Enter project name:", "Create", "Cancel", "MyProject");
+            if (string.IsNullOrEmpty(name)) return;
+
+            // Auto-select default projects directory — no folder picker needed
+            var projectsRoot = Path.Combine(FileSystem.AppDataDirectory, "Projects");
+            Directory.CreateDirectory(projectsRoot);
+            var projectPath = Path.Combine(projectsRoot, name);
 
             try
             {
                 IsBusy = true;
                 StatusText = $"Creating {template} project '{name}'...";
-                await _dotnetCli.NewAsync(template, targetPath, name);
-                
-                var projectPath = Path.Combine(targetPath, name);
+                await _dotnetCli.NewAsync(template, projectsRoot, name);
+
                 await _explorerViewModel.OpenFolderAsync(projectPath);
-                StatusText = $"Project '{name}' created successfully";
+                _ = _gitViewModel.InitializeAsync(projectPath);
+                _buildViewModel.SetProjectPath(projectPath);
+                StatusText = $"Project '{name}' created at {projectPath}";
             }
             catch (Exception ex)
             {
-                await Shell.Current.DisplayAlert("Creation Failed", ex.Message, "OK");
+                await page.DisplayAlert("Creation Failed", ex.Message, "OK");
                 StatusText = "Project creation failed";
             }
             finally
@@ -177,9 +204,19 @@ public class MainShellViewModel : BaseViewModel
             _editorViewModel.OpenTab(tab);
             StatusText = $"Opened {tab.DisplayName}";
 
-            // Also set search root path when files are opened
+            // Set search root path when files are opened
             if (!string.IsNullOrEmpty(_explorerViewModel.CurrentPath))
                 _searchViewModel.SearchRootPath = _explorerViewModel.CurrentPath;
+
+            // Initialize Git panel for the opened folder
+            if (!string.IsNullOrEmpty(_explorerViewModel.CurrentPath))
+                _ = _gitViewModel.InitializeAsync(_explorerViewModel.CurrentPath);
+        };
+
+        // Wire search result navigation to the editor
+        _searchViewModel.OpenFileRequested += (filePath, lineNumber) =>
+        {
+            _ = OpenSearchResultAsync(filePath, lineNumber);
         };
     }
 
@@ -202,5 +239,22 @@ public class MainShellViewModel : BaseViewModel
             System.Diagnostics.Debug.WriteLine($"PickFolderAsync failed: {ex.Message}");
         }
         return null;
+    }
+
+    /// <summary>
+    /// Opens a file from a search result and navigates to the specified line.
+    /// </summary>
+    private async Task OpenSearchResultAsync(string filePath, int lineNumber)
+    {
+        try
+        {
+            var tab = await _editorViewModel.OpenFileForEditorAsync(filePath);
+            if (tab is not null)
+                StatusText = $"Opened {tab.DisplayName}:{lineNumber}";
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"OpenSearchResult failed: {ex.Message}");
+        }
     }
 }

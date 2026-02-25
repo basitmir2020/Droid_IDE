@@ -61,29 +61,96 @@
             <Grid Grid.Column="3" RowSpacing="0">
 
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="40"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="6"/>  <!-- Horizontal Splitter -->
+                    <RowDefinition Height="32"/>  <!-- Build Toolbar -->
+                    <RowDefinition Height="36"/>  <!-- Editor Tabs -->
+                    <RowDefinition Height="*"/>   <!-- Editor Content -->
+                    <RowDefinition Height="6"/>   <!-- Horizontal Splitter -->
                     <RowDefinition x:Name="BottomRow" Height="220"/>
                 </Grid.RowDefinitions>
 
+                <!-- Build Toolbar -->
+                <Grid Grid.Row="0"
+                      BackgroundColor="#2D2D2D"
+                      Padding="8,0"
+                      ColumnSpacing="4">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Run Button -->
+                    <Button Grid.Column="0"
+                            Text="▶ Run"
+                            FontSize="11"
+                            TextColor="#4EC9B0"
+                            BackgroundColor="Transparent"
+                            Padding="8,0"
+                            HeightRequest="28"
+                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MainShellViewModel}}, Path=Build.RunCommand}"
+                            IsEnabled="{Binding Source={RelativeSource AncestorType={x:Type vm:MainShellViewModel}}, Path=Build.CanBuildOrRun}"/>
+
+                    <!-- Build Button -->
+                    <Button Grid.Column="1"
+                            Text="🔨 Build"
+                            FontSize="11"
+                            TextColor="#9CDCFE"
+                            BackgroundColor="Transparent"
+                            Padding="8,0"
+                            HeightRequest="28"
+                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MainShellViewModel}}, Path=Build.BuildCommand}"
+                            IsEnabled="{Binding Source={RelativeSource AncestorType={x:Type vm:MainShellViewModel}}, Path=Build.CanBuildOrRun}"/>
+
+                    <!-- Stop Button -->
+                    <Button Grid.Column="2"
+                            Text="⏹ Stop"
+                            FontSize="11"
+                            TextColor="#F48771"
+                            BackgroundColor="Transparent"
+                            Padding="8,0"
+                            HeightRequest="28"
+                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MainShellViewModel}}, Path=Build.StopCommand}"/>
+
+                    <!-- Clean Button -->
+                    <Button Grid.Column="3"
+                            Text="🧹 Clean"
+                            FontSize="11"
+                            TextColor="#888888"
+                            BackgroundColor="Transparent"
+                            Padding="8,0"
+                            HeightRequest="28"
+                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MainShellViewModel}}, Path=Build.CleanCommand}"
+                            IsEnabled="{Binding Source={RelativeSource AncestorType={x:Type vm:MainShellViewModel}}, Path=Build.CanBuildOrRun}"/>
+
+                    <!-- Build Status Label -->
+                    <Label Grid.Column="5"
+                           Text="{Binding Source={RelativeSource AncestorType={x:Type vm:MainShellViewModel}}, Path=Build.BuildStatus}"
+                           TextColor="#888888"
+                           FontSize="11"
+                           VerticalOptions="Center"
+                           Margin="0,0,8,0"/>
+                </Grid>
+
                 <!-- Editor Tabs — binds to EditorViewModel -->
-                <layout:EditorTabsView Grid.Row="0"
+                <layout:EditorTabsView Grid.Row="1"
                                        BindingContext="{Binding Editor}"/>
 
                 <!-- Editor Host — binds to EditorViewModel -->
                 <layout:EditorHostView x:Name="EditorHost"
-                                       Grid.Row="1"
+                                       Grid.Row="2"
                                        BindingContext="{Binding Editor}"/>
 
                 <!-- Horizontal Splitter -->
                 <BoxView x:Name="HorizontalSplitter"
-                         Grid.Row="2"
+                         Grid.Row="3"
                          HeightRequest="6"
                          BackgroundColor="#444444"/>
 
                 <!-- Bottom Panel — binds to TerminalViewModel -->
-                <layout:BottomPanelView Grid.Row="3"
+                <layout:BottomPanelView Grid.Row="4"
                                         BindingContext="{Binding Terminal}"
                                         IsVisible="{Binding Source={RelativeSource AncestorType={x:Type vm:MainShellViewModel}}, Path=IsBottomPanelVisible}"/>
 

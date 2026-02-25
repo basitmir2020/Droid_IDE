@@ -41,7 +41,7 @@ public class DotnetCliService : IDotnetCli
         var outputLines = new List<string>();
 
         var workingDir = Path.GetDirectoryName(projectPath) ?? ".";
-        var process = await _processManager.StartAsync("dotnet", $"build \"{projectPath}\" --no-restore",
+        var process = await _processManager.StartAsync(ResolveDotnetBinary(), $"build \"{projectPath}\" --no-restore",
             workingDir, cancellationToken);
 
         var tcs = new TaskCompletionSource<int>();
@@ -84,7 +84,7 @@ public class DotnetCliService : IDotnetCli
     public async Task<IRunningProcess> RunAsync(string projectPath, CancellationToken cancellationToken = default)
     {
         var workingDir = Path.GetDirectoryName(projectPath) ?? ".";
-        return await _processManager.StartAsync("dotnet", $"run --project \"{projectPath}\"",
+        return await _processManager.StartAsync(ResolveDotnetBinary(), $"run --project \"{projectPath}\"",
             workingDir, cancellationToken);
     }
 
@@ -92,7 +92,7 @@ public class DotnetCliService : IDotnetCli
     public async Task<ProcessResult> NewAsync(string template, string outputDirectory, string name,
         CancellationToken cancellationToken = default)
     {
-        return await _processManager.RunAsync("dotnet", $"new {template} -n \"{name}\" -o \"{outputDirectory}\"",
+        return await _processManager.RunAsync(ResolveDotnetBinary(), $"new {template} -n \"{name}\" -o \"{outputDirectory}\"",
             outputDirectory, cancellationToken);
     }
 
@@ -100,7 +100,7 @@ public class DotnetCliService : IDotnetCli
     public async Task<ProcessResult> RestoreAsync(string projectPath, CancellationToken cancellationToken = default)
     {
         var workingDir = Path.GetDirectoryName(projectPath) ?? ".";
-        return await _processManager.RunAsync("dotnet", $"restore \"{projectPath}\"",
+        return await _processManager.RunAsync(ResolveDotnetBinary(), $"restore \"{projectPath}\"",
             workingDir, cancellationToken);
     }
 
@@ -108,7 +108,7 @@ public class DotnetCliService : IDotnetCli
     public async Task<ProcessResult> TestAsync(string projectPath, CancellationToken cancellationToken = default)
     {
         var workingDir = Path.GetDirectoryName(projectPath) ?? ".";
-        return await _processManager.RunAsync("dotnet", $"test \"{projectPath}\"",
+        return await _processManager.RunAsync(ResolveDotnetBinary(), $"test \"{projectPath}\"",
             workingDir, cancellationToken);
     }
 
@@ -116,14 +116,14 @@ public class DotnetCliService : IDotnetCli
     public async Task<ProcessResult> CleanAsync(string projectPath, CancellationToken cancellationToken = default)
     {
         var workingDir = Path.GetDirectoryName(projectPath) ?? ".";
-        return await _processManager.RunAsync("dotnet", $"clean \"{projectPath}\"",
+        return await _processManager.RunAsync(ResolveDotnetBinary(), $"clean \"{projectPath}\"",
             workingDir, cancellationToken);
     }
 
     /// <inheritdoc/>
     public async Task<string> GetSdkVersionAsync()
     {
-        var result = await _processManager.RunAsync("dotnet", "--version", ".");
+        var result = await _processManager.RunAsync(ResolveDotnetBinary(), "--version", ".");
         return result.StandardOutput.Trim();
     }
 
@@ -136,7 +136,7 @@ public class DotnetCliService : IDotnetCli
     {
         try
         {
-            var result = await _processManager.RunAsync("dotnet", "--version", ".");
+            var result = await _processManager.RunAsync(ResolveDotnetBinary(), "--version", ".");
             return result.Success && !string.IsNullOrWhiteSpace(result.StandardOutput);
         }
         catch
@@ -144,4 +144,41 @@ public class DotnetCliService : IDotnetCli
             return false;
         }
     }
+
+    /// <summary>
+    /// Resolves the absolute path to the dotnet CLI binary.
+    /// Checks (in order):
+    /// 1. DOTNET_ROOT environment variable  →  $DOTNET_ROOT/dotnet
+    /// 2. Common Termux paths on Android
+    /// 3. Falls back to bare "dotnet" (works on Windows/macOS where it's in PATH)
+    /// </summary>
+    private static string ResolveDotnetBinary()
+    {
+        // 1. DOTNET_ROOT env var (set by LinuxEnvironmentManager.Configure())
+        var dotnetRoot = Environment.GetEnvironmentVariable("DOTNET_ROOT");
+        if (!string.IsNullOrEmpty(dotnetRoot))
+        {
+            var candidate = Path.Combine(dotnetRoot, "dotnet");
+            if (File.Exists(candidate)) return candidate;
+        }
+
+        // 2. Common Termux / proot-distro Android paths
+        var termuxCandidates = new[]
+        {
+            "/data/data/com.termux/files/usr/bin/dotnet",
+            "/data/data/com.termux/files/home/.dotnet/dotnet",
+            "/data/user/0/com.termux/files/usr/bin/dotnet",
+            "/usr/bin/dotnet",
+            "/usr/local/bin/dotnet"
+        };
+
+        foreach (var path in termuxCandidates)
+        {
+            if (File.Exists(path)) return path;
+        }
+
+        // 3. Bare name — works on Windows/macOS/Linux where dotnet is in PATH
+        return "dotnet";
+    }
 }
+

@@ -59,21 +59,32 @@
 
             currentModel = editor.getModel();
 
-            // Notify C# when content changes
+            // Notify C# when content changes (debounced 300ms)
             editor.onDidChangeModelContent(function () {
                 try {
-                    // Use a debounced approach — the bridge polls or we use invokeCSharp
                     window._lastContent = editor.getValue();
+                    clearTimeout(window._contentDebounce);
+                    window._contentDebounce = setTimeout(function () {
+                        // Signal C# via URL scheme — C# intercepts in Navigating event
+                        window.location.href = 'droidide://contentChanged';
+                    }, 300);
                 } catch (e) { }
             });
 
-            // Notify C# when cursor position changes
+            // Notify C# when cursor position changes (debounced 100ms)
             editor.onDidChangeCursorPosition(function (e) {
                 try {
                     window._cursorLine = e.position.lineNumber;
                     window._cursorColumn = e.position.column;
+                    clearTimeout(window._cursorDebounce);
+                    window._cursorDebounce = setTimeout(function () {
+                        window.location.href = 'droidide://cursorChanged?line=' + e.position.lineNumber + '&col=' + e.position.column;
+                    }, 100);
                 } catch (e) { }
             });
+
+            // Signal C# that Monaco is fully ready
+            window.location.href = 'droidide://editorReady';
         });
 
         // ── Bridge Functions (called from C# via EvaluateJavaScriptAsync) ──

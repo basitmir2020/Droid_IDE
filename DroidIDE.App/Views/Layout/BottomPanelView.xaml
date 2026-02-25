@@ -30,9 +30,7 @@
                         <Binding.FallbackValue>#1E1E1E</Binding.FallbackValue>
                     </Binding>
                 </Border.BackgroundColor>
-                <Label Text="TERMINAL"
-                       FontSize="11"
-                       FontAttributes="Bold">
+                <Label Text="TERMINAL" FontSize="11" FontAttributes="Bold">
                     <Label.TextColor>
                         <Binding Path="ActiveBottomTab"
                                  Converter="{StaticResource StringEqualsConverter}"
@@ -46,11 +44,23 @@
                 </Label>
             </Border>
 
-            <!-- Output Tab -->
-            <Border BackgroundColor="Transparent" Stroke="Transparent" Padding="10,6">
-                <Label Text="OUTPUT"
-                       TextColor="#888888"
-                       FontSize="11">
+            <!-- Output Tab (Build / Run output) -->
+            <Border Padding="10,6" Stroke="Transparent" StrokeShape="RoundRectangle 0">
+                <Border.BackgroundColor>
+                    <Binding Path="ActiveBottomTab"
+                             Converter="{StaticResource StringEqualsConverter}"
+                             ConverterParameter="Output">
+                        <Binding.FallbackValue>#1E1E1E</Binding.FallbackValue>
+                    </Binding>
+                </Border.BackgroundColor>
+                <Label Text="OUTPUT" FontSize="11" FontAttributes="Bold">
+                    <Label.TextColor>
+                        <Binding Path="ActiveBottomTab"
+                                 Converter="{StaticResource StringEqualsConverter}"
+                                 ConverterParameter="Output">
+                            <Binding.FallbackValue>#888888</Binding.FallbackValue>
+                        </Binding>
+                    </Label.TextColor>
                     <Label.GestureRecognizers>
                         <TapGestureRecognizer Command="{Binding SwitchBottomTabCommand}" CommandParameter="Output"/>
                     </Label.GestureRecognizers>
@@ -59,9 +69,7 @@
 
             <!-- Problems Tab -->
             <Border BackgroundColor="Transparent" Stroke="Transparent" Padding="10,6">
-                <Label Text="PROBLEMS"
-                       TextColor="#888888"
-                       FontSize="11">
+                <Label Text="PROBLEMS" TextColor="#888888" FontSize="11">
                     <Label.GestureRecognizers>
                         <TapGestureRecognizer Command="{Binding SwitchBottomTabCommand}" CommandParameter="Problems"/>
                     </Label.GestureRecognizers>
@@ -69,22 +77,17 @@
             </Border>
 
             <!-- Spacer -->
-            <BoxView HorizontalOptions="Fill"
-                     Color="Transparent"/>
+            <BoxView HorizontalOptions="Fill" Color="Transparent"/>
 
             <!-- New Terminal Button -->
-            <ImageButton WidthRequest="16"
-                         HeightRequest="16"
+            <ImageButton WidthRequest="16" HeightRequest="16"
                          VerticalOptions="Center"
                          BackgroundColor="Transparent"
                          Command="{Binding NewSessionCommand}"/>
 
             <!-- Clear Button -->
-            <Label Text="⌫"
-                   TextColor="#888888"
-                   FontSize="14"
-                   VerticalOptions="Center"
-                   Margin="6,0">
+            <Label Text="⌫" TextColor="#888888" FontSize="14"
+                   VerticalOptions="Center" Margin="6,0">
                 <Label.GestureRecognizers>
                     <TapGestureRecognizer Command="{Binding ClearOutputCommand}"/>
                 </Label.GestureRecognizers>
@@ -92,46 +95,53 @@
 
         </HorizontalStackLayout>
 
-        <!-- Terminal Output -->
+        <!-- Terminal Output (visible when Terminal tab active) -->
         <CollectionView Grid.Row="1"
                         ItemsSource="{Binding OutputLines}"
                         BackgroundColor="#1E1E1E"
-                        Margin="0">
-
+                        IsVisible="{Binding ActiveBottomTab, Converter={StaticResource StringEqualsConverter}, ConverterParameter=Terminal}">
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="x:String">
-                    <Label Text="{Binding}"
-                           TextColor="#CCCCCC"
-                           FontFamily="monospace"
-                           FontSize="12"
-                           Padding="10,1"/>
+                    <Label Text="{Binding}" TextColor="#CCCCCC" FontFamily="monospace"
+                           FontSize="12" Padding="10,1"/>
                 </DataTemplate>
             </CollectionView.ItemTemplate>
-
             <CollectionView.EmptyView>
                 <Label Text="Terminal ready. Type a command below."
-                       TextColor="#666666"
-                       FontSize="12"
-                       Padding="10,8"/>
+                       TextColor="#666666" FontSize="12" Padding="10,8"/>
             </CollectionView.EmptyView>
         </CollectionView>
 
-        <!-- Command Input -->
+        <!-- Build / Run Output (visible when Output tab active) -->
+        <CollectionView Grid.Row="1"
+                        ItemsSource="{Binding Source={RelativeSource AncestorType={x:Type vm:MainShellViewModel}}, Path=Build.BuildOutput}"
+                        BackgroundColor="#1E1E1E"
+                        IsVisible="{Binding ActiveBottomTab, Converter={StaticResource StringEqualsConverter}, ConverterParameter=Output}">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="x:String">
+                    <Label Text="{Binding}" TextColor="#CCCCCC" FontFamily="monospace"
+                           FontSize="12" Padding="10,1"/>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+            <CollectionView.EmptyView>
+                <Label Text="Build output will appear here."
+                       TextColor="#666666" FontSize="12" Padding="10,8"/>
+            </CollectionView.EmptyView>
+        </CollectionView>
+
+        <!-- Command Input (only shown for Terminal tab) -->
         <Grid Grid.Row="2"
               BackgroundColor="#1E1E1E"
               Padding="10,4"
-              ColumnSpacing="8">
+              ColumnSpacing="8"
+              IsVisible="{Binding ActiveBottomTab, Converter={StaticResource StringEqualsConverter}, ConverterParameter=Terminal}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <Label Grid.Column="0"
-                   Text="$"
-                   TextColor="#0078D4"
-                   FontFamily="monospace"
-                   FontSize="13"
-                   VerticalOptions="Center"/>
+            <Label Grid.Column="0" Text="$" TextColor="#0078D4"
+                   FontFamily="monospace" FontSize="13" VerticalOptions="Center"/>
 
             <Entry Grid.Column="1"
                    Text="{Binding CommandInput, Mode=TwoWay}"
