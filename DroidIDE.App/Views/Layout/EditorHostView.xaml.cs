@@ -35,6 +35,18 @@ public partial class EditorHostView : ContentView
             if (_viewModel is not null)
                 _ = _viewModel.ProvideCompletionsAsync(caretOffset);
         };
+
+        MonacoEditor.DefinitionRequested += caretOffset =>
+        {
+            if (_viewModel is not null)
+                _ = _viewModel.GoToDefinitionAsync(caretOffset);
+        };
+
+        MonacoEditor.ReferencesRequested += caretOffset =>
+        {
+            if (_viewModel is not null)
+                _ = _viewModel.FindReferencesAsync(caretOffset);
+        };
     }
 
     private void OnBindingContextChanged(object? sender, EventArgs e)

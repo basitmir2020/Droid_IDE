@@ -35,13 +35,25 @@ public class GitViewModel : BaseViewModel
         _repoManager.RepositoryOpened += path =>
         {
             IsRepoOpen = true;
-            _ = RefreshStatusAsync();
+            _ = SafeRefreshStatusAsync();
         };
 
         _branchManager.BranchChanged += branch =>
         {
             CurrentBranch = branch;
         };
+    }
+
+    private async Task SafeRefreshStatusAsync()
+    {
+        try
+        {
+            await RefreshStatusAsync();
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[GitViewModel] RefreshStatus failed: {ex.Message}");
+        }
     }
 
     private bool _isRepoOpen;
@@ -115,12 +127,19 @@ public class GitViewModel : BaseViewModel
     /// </summary>
     public async Task InitializeAsync(string repoPath)
     {
-        if (_gitService.IsRepository(repoPath))
+        try
         {
-            _repoManager.OpenRepository(repoPath);
-            CurrentBranch = await _branchManager.GetCurrentBranchAsync(repoPath);
-            await RefreshStatusAsync();
-            await RefreshBranchesAsync();
+            if (_gitService.IsRepository(repoPath))
+            {
+                _repoManager.OpenRepository(repoPath);
+                CurrentBranch = await _branchManager.GetCurrentBranchAsync(repoPath);
+                await RefreshStatusAsync();
+                await RefreshBranchesAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[GitViewModel] InitializeAsync failed: {ex.Message}");
         }
     }
 

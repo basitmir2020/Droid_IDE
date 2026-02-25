@@ -15,20 +15,48 @@
         </Grid.RowDefinitions>
 
         <!-- Header -->
-        <Grid Grid.Row="0" BackgroundColor="#252526" Padding="12,0">
-            <Label Text="EXPLORER"
+        <Grid Grid.Row="0" BackgroundColor="#252526" Padding="12,0" ColumnSpacing="4">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="32"/>
+                <ColumnDefinition Width="32"/>
+                <ColumnDefinition Width="32"/>
+            </Grid.ColumnDefinitions>
+
+            <Label Grid.Column="0"
+                   Text="EXPLORER"
                    TextColor="#BBBBBB"
                    FontSize="11"
                    FontAttributes="Bold"
                    VerticalOptions="Center"/>
 
-            <ImageButton Source="refresh"
+            <Button Grid.Column="1"
+                    Text="📄+"
+                    TextColor="#CCCCCC"
+                    FontSize="12"
+                    BackgroundColor="Transparent"
+                    Padding="0"
+                    Command="{Binding CreateFileCommand}"
+                    ToolTipProperties.Text="New File"/>
+
+            <Button Grid.Column="2" 
+                    Text="📁+"
+                    TextColor="#CCCCCC"
+                    FontSize="12"
+                    BackgroundColor="Transparent"
+                    Padding="0"
+                    Command="{Binding CreateFolderCommand}"
+                    ToolTipProperties.Text="New Folder"/>
+
+            <ImageButton Grid.Column="3"
+                         Source="refresh"
                          WidthRequest="16"
                          HeightRequest="16"
                          HorizontalOptions="End"
                          VerticalOptions="Center"
                          BackgroundColor="Transparent"
-                         Command="{Binding RefreshCommand}"/>
+                         Command="{Binding RefreshCommand}"
+                         ToolTipProperties.Text="Refresh Explorer"/>
         </Grid>
 
         <!-- File Tree -->
@@ -40,6 +68,24 @@
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="models:FileItem">
                     <Grid Padding="20,6,10,6" ColumnSpacing="8">
+                        <FlyoutBase.ContextFlyout>
+                            <MenuFlyout>
+                                <MenuFlyoutItem Text="New File" 
+                                                Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ExplorerViewModel}}, Path=CreateFileCommand}" 
+                                                CommandParameter="{Binding .}"/>
+                                <MenuFlyoutItem Text="New Folder" 
+                                                Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ExplorerViewModel}}, Path=CreateFolderCommand}" 
+                                                CommandParameter="{Binding .}"/>
+                                <MenuFlyoutSeparator />
+                                <MenuFlyoutItem Text="Rename" 
+                                                Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ExplorerViewModel}}, Path=RenameCommand}" 
+                                                CommandParameter="{Binding .}"/>
+                                <MenuFlyoutItem Text="Delete" 
+                                                Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ExplorerViewModel}}, Path=DeleteCommand}" 
+                                                CommandParameter="{Binding .}"/>
+                            </MenuFlyout>
+                        </FlyoutBase.ContextFlyout>
+                        
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="16"/>
                             <ColumnDefinition Width="*"/>

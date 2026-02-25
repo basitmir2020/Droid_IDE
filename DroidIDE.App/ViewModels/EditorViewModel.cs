@@ -33,6 +33,10 @@ public class EditorViewModel : BaseViewModel
         get => _activeTab;
         set
         {
+            // If the UI (like CollectionView) tries to set null when we have tabs, 
+            // ignore it to prevent race conditions during list refreshes.
+            if (value is null && OpenTabs.Count > 0) return;
+
             // Deactivate previous tab
             if (_activeTab is not null)
                 _activeTab.IsActive = false;
@@ -41,16 +45,27 @@ public class EditorViewModel : BaseViewModel
             {
                 value.IsActive = true;
 
-                // Update Roslyn workspace with the new tab's content
-                _ = Task.Run(() => _languageService.UpdateDocument(value.FilePath, value.Content));
-
-                // Trigger diagnostics for C# files (other files: clear markers)
-                if (value.Language == "csharp")
-                    _ = RunDiagnosticsAsync(value);
-                else
-                    _ = _bridge.SetMarkersAsync([]);
+                // Sync to Monaco and Roslyn
+                RefreshActiveEditor();
+                
+                // Fire property changed for nested properties just in case
+                OnPropertyChanged(nameof(ActiveTab));
             }
         }
+    }
+
+    private void RefreshActiveEditor()
+    {
+        if (ActiveTab is null) return;
+
+        // Update Roslyn workspace with the new tab's content
+        _ = Task.Run(() => _languageService.UpdateDocument(ActiveTab.FilePath, ActiveTab.Content));
+
+        // Trigger diagnostics for C# files (other files: clear markers)
+        if (ActiveTab.Language == "csharp")
+            _ = RunDiagnosticsAsync(ActiveTab);
+        else
+            _ = _bridge.SetMarkersAsync([]);
     }
 
     public ICommand CloseTabCommand { get; }
@@ -169,11 +184,6 @@ public class EditorViewModel : BaseViewModel
 
     // ── IntelliSense completions ─────────────────────────────────
 
-    /// <summary>
-    /// Fetches Roslyn completions at the given character offset and pushes
-    /// them to the Monaco editor. Called by MonacoEditorView when JS fires
-    /// the droidide://completionRequested URL scheme.
-    /// </summary>
     public async Task ProvideCompletionsAsync(int caretOffset)
     {
         if (ActiveTab is null || ActiveTab.Language != "csharp") return;
@@ -197,6 +207,52 @@ public class EditorViewModel : BaseViewModel
         {
             System.Diagnostics.Debug.WriteLine($"[EditorViewModel] completions error: {ex.Message}");
         }
+    }
+
+    /// <summary>
+    /// Finds the source definition for the symbol at the given offset and navigates to it.
+    /// </summary>
+    public async Task GoToDefinitionAsync(int caretOffset)
+    {
+        if (ActiveTab is null || ActiveTab.Language != "csharp") return;
+
+        try
+        {
+            var def = await _languageService.GetDefinitionAsync(ActiveTab.FilePath, caretOffset);
+            if (def is null) return;
+
+            // If it's a different file, open it first
+            if (def.FilePath != ActiveTab.FilePath)
+            {
+                var tab = await OpenFileForEditorAsync(def.FilePath);
+                if (tab is null) return;
+            }
+
+            // Navigate to the line/column in the (now active) editor
+            await _bridge.GoToPositionAsync(def.StartLine, def.StartColumn);
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[EditorViewModel] go to definition error: {ex.Message}");
+        }
+    }
+
+    /// <summary>
+    /// Navigates to a specific line and column in the active editor.
+    /// </summary>
+    public async Task GoToLineAsync(int line, int column = 1)
+    {
+        if (_bridge is null) return;
+        await _bridge.GoToPositionAsync(line, column);
+    }
+
+    /// <summary>
+    /// Placeholder for reference finding logic.
+    /// </summary>
+    public async Task FindReferencesAsync(int caretOffset)
+    {
+        // TODO: Implement reference tool window or global search integration
+        await Task.CompletedTask;
     }
 
     // ── Private helpers ──────────────────────────────────────────

@@ -19,6 +19,7 @@ public class SearchViewModel : BaseViewModel
 
         SearchCommand = new AsyncRelayCommand(ExecuteSearchAsync);
         ClearCommand = new RelayCommand(ClearResults);
+        OpenResultCommand = new RelayCommand<SearchResult>(OpenResult);
 
         _searchService.FilesScanned += count =>
             StatusText = $"Scanned {count} files...";
@@ -63,6 +64,7 @@ public class SearchViewModel : BaseViewModel
 
     public ICommand SearchCommand { get; }
     public ICommand ClearCommand { get; }
+    public ICommand OpenResultCommand { get; }
 
     /// <summary>Fired when user wants to open a search result in the editor.</summary>
     public event Action<string, int>? OpenFileRequested;

@@ -129,6 +129,14 @@ public partial class MonacoEditorView : ContentView, IMonacoWebView
             case "completionrequested":
                 await HandleCompletionRequestedAsync(uri);
                 break;
+
+            case "definitionrequested":
+                HandleDefinitionRequested(uri);
+                break;
+
+            case "referencesrequested":
+                HandleReferencesRequested(uri);
+                break;
         }
     }
 
@@ -201,9 +209,37 @@ public partial class MonacoEditorView : ContentView, IMonacoWebView
         await Task.CompletedTask;
     }
 
+    private void HandleDefinitionRequested(Uri uri)
+    {
+        var query = System.Web.HttpUtility.ParseQueryString(uri.Query);
+        if (int.TryParse(query["pos"], out var position))
+        {
+            DefinitionRequested?.Invoke(position);
+        }
+    }
+
+    private void HandleReferencesRequested(Uri uri)
+    {
+        var query = System.Web.HttpUtility.ParseQueryString(uri.Query);
+        if (int.TryParse(query["pos"], out var position))
+        {
+            ReferencesRequested?.Invoke(position);
+        }
+    }
+
     /// <summary>
     /// Raised when the user triggers IntelliSense in Monaco.
     /// The host is responsible for fetching completions and pushing them back.
     /// </summary>
     public event Action<int>? CompletionRequested;
+
+    /// <summary>
+    /// Raised when the user requests "Go to Definition".
+    /// </summary>
+    public event Action<int>? DefinitionRequested;
+
+    /// <summary>
+    /// Raised when the user requests "Find All References".
+    /// </summary>
+    public event Action<int>? ReferencesRequested;
 }

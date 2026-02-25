@@ -98,25 +98,30 @@
                         <CollectionView ItemsSource="{Binding Results}">
                             <CollectionView.ItemTemplate>
                                 <DataTemplate x:DataType="svc:SearchResult">
-                                    <Grid Padding="20,4,8,4" ColumnSpacing="8">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="32"/>
-                                            <ColumnDefinition Width="*"/>
-                                        </Grid.ColumnDefinitions>
+                                        <Grid Padding="20,4,8,4" ColumnSpacing="8">
+                                            <Grid.GestureRecognizers>
+                                                <TapGestureRecognizer 
+                                                    Command="{Binding Source={RelativeSource AncestorType={x:Type vm:SearchViewModel}}, Path=OpenResultCommand}"
+                                                    CommandParameter="{Binding .}"/>
+                                            </Grid.GestureRecognizers>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="32"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
 
-                                        <Label Grid.Column="0"
-                                               Text="{Binding LineNumber}"
-                                               TextColor="#858585"
-                                               FontSize="11"
-                                               HorizontalTextAlignment="End"/>
+                                            <Label Grid.Column="0"
+                                                   Text="{Binding LineNumber}"
+                                                   TextColor="#858585"
+                                                   FontSize="11"
+                                                   HorizontalTextAlignment="End"/>
 
-                                        <Label Grid.Column="1"
-                                               Text="{Binding LineContent}"
-                                               TextColor="#D4D4D4"
-                                               FontSize="11"
-                                               LineBreakMode="TailTruncation"
-                                               MaxLines="1"/>
-                                    </Grid>
+                                            <Label Grid.Column="1"
+                                                   Text="{Binding LineContent}"
+                                                   TextColor="#D4D4D4"
+                                                   FontSize="11"
+                                                   LineBreakMode="TailTruncation"
+                                                   MaxLines="1"/>
+                                        </Grid>
                                 </DataTemplate>
                             </CollectionView.ItemTemplate>
                         </CollectionView>

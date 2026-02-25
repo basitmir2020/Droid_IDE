@@ -92,7 +92,7 @@ public class MainShellViewModel : BaseViewModel
         
         CloneRepoCommand = new AsyncRelayCommand(async () =>
         {
-            var page = Application.Current?.MainPage;
+            var page = Application.Current?.Windows[0].Page;
             if (page is null) return;
 
             var url = await page.DisplayPromptAsync("Clone Repository", "Enter Git repository URL:", "Clone", "Cancel", "https://github.com/...");
@@ -118,7 +118,7 @@ public class MainShellViewModel : BaseViewModel
             }
             catch (Exception ex)
             {
-                await page.DisplayAlert("Clone Failed", ex.Message, "OK");
+                await page.DisplayAlertAsync("Clone Failed", ex.Message, "OK");
                 StatusText = "Clone failed";
             }
             finally
@@ -129,10 +129,10 @@ public class MainShellViewModel : BaseViewModel
 
         NewProjectCommand = new AsyncRelayCommand(async () =>
         {
-            var page = Application.Current?.MainPage;
+            var page = Application.Current?.Windows[0].Page;
             if (page is null) return;
 
-            var template = await page.DisplayActionSheet("Select Project Template", "Cancel", null, "console", "classlib", "webapi", "maui");
+            var template = await page.DisplayActionSheetAsync("Select Project Template", "Cancel", null, "console", "classlib", "webapi", "maui");
             if (template == "Cancel" || string.IsNullOrEmpty(template)) return;
 
             var name = await page.DisplayPromptAsync("New Project", "Enter project name:", "Create", "Cancel", "MyProject");
@@ -149,34 +149,38 @@ public class MainShellViewModel : BaseViewModel
                 StatusText = $"Creating {template} project '{name}'...";
 
                 // Create project files directly — no dotnet CLI needed
-                await Task.Run(() => Services.ProjectScaffolder.Create(template, projectPath, name));
+                var scaffoldTask = Task.Run(() => Services.ProjectScaffolder.Create(template, projectPath, name));
+                await scaffoldTask;
 
-                await _explorerViewModel.OpenFolderAsync(projectPath);
-                
-                // Ensure sidebar is visible and active
-                ActivePanel = "Explorer";
-                IsExplorerVisible = true;
-
-                // Automatically open the main file to show the project is "opened"
-                string mainFile = template.ToLowerInvariant() switch
+                MainThread.BeginInvokeOnMainThread(async () =>
                 {
-                    "console" or "webapi" or "maui" => "Program.cs",
-                    "classlib" => "Class1.cs",
-                    _ => "Program.cs"
-                };
-                var mainFilePath = Path.Combine(projectPath, mainFile);
-                if (File.Exists(mainFilePath))
-                {
-                    await _editorViewModel.OpenFileForEditorAsync(mainFilePath);
-                }
+                    await _explorerViewModel.OpenFolderAsync(projectPath);
+                    
+                    // Ensure sidebar is visible and active
+                    ActivePanel = "Explorer";
+                    IsExplorerVisible = true;
 
-                _ = _gitViewModel.InitializeAsync(projectPath);
-                _buildViewModel.SetProjectPath(projectPath);
-                StatusText = $"Project '{name}' opened";
+                    // Automatically open the main file to show the project is "opened"
+                    string mainFile = template.ToLowerInvariant() switch
+                    {
+                        "console" or "webapi" or "maui" => "Program.cs",
+                        "classlib" => "Class1.cs",
+                        _ => "Program.cs"
+                    };
+                    var mainFilePath = Path.Combine(projectPath, mainFile);
+                    if (File.Exists(mainFilePath))
+                    {
+                        await _editorViewModel.OpenFileForEditorAsync(mainFilePath);
+                    }
+
+                    _ = _gitViewModel.InitializeAsync(projectPath);
+                    _buildViewModel.SetProjectPath(projectPath);
+                    StatusText = $"Project '{name}' opened";
+                });
             }
             catch (Exception ex)
             {
-                await page.DisplayAlert("Creation Failed", ex.Message, "OK");
+                await page.DisplayAlertAsync("Creation Failed", ex.Message, "OK");
                 StatusText = "Project creation failed";
             }
             finally
@@ -216,6 +220,15 @@ public class MainShellViewModel : BaseViewModel
                 _ = _gitViewModel.InitializeAsync(_explorerViewModel.CurrentPath);
         };
 
+        // Also sync SearchRootPath when explorer current path changes (e.g. folder opened)
+        _explorerViewModel.PropertyChanged += (s, e) =>
+        {
+            if (e.PropertyName == nameof(ExplorerViewModel.CurrentPath) && !string.IsNullOrEmpty(_explorerViewModel.CurrentPath))
+            {
+                _searchViewModel.SearchRootPath = _explorerViewModel.CurrentPath;
+            }
+        };
+
         // Wire search result navigation to the editor
         _searchViewModel.OpenFileRequested += (filePath, lineNumber) =>
         {
@@ -253,7 +266,10 @@ public class MainShellViewModel : BaseViewModel
         {
             var tab = await _editorViewModel.OpenFileForEditorAsync(filePath);
             if (tab is not null)
+            {
+                await _editorViewModel.GoToLineAsync(lineNumber);
                 StatusText = $"Opened {tab.DisplayName}:{lineNumber}";
+            }
         }
         catch (Exception ex)
         {

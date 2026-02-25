@@ -7,50 +7,77 @@
              x:DataType="vm:MainShellViewModel"
              BackgroundColor="#333333">
 
-    <VerticalStackLayout
-        Spacing="4"
-        Padding="4,12"
-        HorizontalOptions="Center">
+    <Grid RowSpacing="0" VerticalOptions="Fill">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
 
-        <!-- Explorer -->
-        <ImageButton Source="explorer.svg"
-                     WidthRequest="28"
-                     HeightRequest="28"
-                     Padding="4"
-                     BackgroundColor="Transparent"
-                     Command="{Binding ShowPanelCommand}"
-                     CommandParameter="Explorer"
-                     ToolTipProperties.Text="Explorer"/>
+        <!-- Top Icons -->
+        <VerticalStackLayout Grid.Row="0"
+                             Spacing="4"
+                             Padding="4,12"
+                             HorizontalOptions="Center">
 
-        <!-- Search -->
-        <ImageButton Source="search.svg"
-                     WidthRequest="28"
-                     HeightRequest="28"
-                     Padding="4"
-                     BackgroundColor="Transparent"
-                     Command="{Binding ShowPanelCommand}"
-                     CommandParameter="Search"
-                     ToolTipProperties.Text="Search"/>
+            <!-- Explorer -->
+            <ImageButton Source="explorer.svg"
+                         WidthRequest="28"
+                         HeightRequest="28"
+                         Padding="4"
+                         BackgroundColor="Transparent"
+                         Command="{Binding ShowPanelCommand}"
+                         CommandParameter="Explorer"
+                         ToolTipProperties.Text="Explorer"/>
 
-        <!-- Git -->
-        <ImageButton Source="git.svg"
-                     WidthRequest="28"
-                     HeightRequest="28"
-                     Padding="4"
-                     BackgroundColor="Transparent"
-                     Command="{Binding ShowPanelCommand}"
-                     CommandParameter="Git"
-                     ToolTipProperties.Text="Source Control"/>
+            <!-- Search -->
+            <ImageButton Source="search.svg"
+                         WidthRequest="28"
+                         HeightRequest="28"
+                         Padding="4"
+                         BackgroundColor="Transparent"
+                         Command="{Binding ShowPanelCommand}"
+                         CommandParameter="Search"
+                         ToolTipProperties.Text="Search"/>
 
-        <!-- Debug -->
-        <ImageButton Source="debug.svg"
-                     WidthRequest="28"
-                     HeightRequest="28"
-                     Padding="4"
-                     BackgroundColor="Transparent"
-                     Command="{Binding ShowPanelCommand}"
-                     CommandParameter="Debug"
-                     ToolTipProperties.Text="Run and Debug"/>
+            <!-- Git -->
+            <ImageButton Source="git.svg"
+                         WidthRequest="28"
+                         HeightRequest="28"
+                         Padding="4"
+                         BackgroundColor="Transparent"
+                         Command="{Binding ShowPanelCommand}"
+                         CommandParameter="Git"
+                         ToolTipProperties.Text="Source Control"/>
 
-    </VerticalStackLayout>
+            <!-- Debug -->
+            <ImageButton Source="debug.svg"
+                         WidthRequest="28"
+                         HeightRequest="28"
+                         Padding="4"
+                         BackgroundColor="Transparent"
+                         Command="{Binding ShowPanelCommand}"
+                         CommandParameter="Debug"
+                         ToolTipProperties.Text="Run and Debug"/>
+
+        </VerticalStackLayout>
+
+        <!-- Bottom Icons -->
+        <VerticalStackLayout Grid.Row="1"
+                             Spacing="4"
+                             Padding="4,12"
+                             HorizontalOptions="Center"
+                             VerticalOptions="End">
+
+            <!-- Settings -->
+            <ImageButton Source="settings.svg"
+                         WidthRequest="28"
+                         HeightRequest="28"
+                         Padding="4"
+                         BackgroundColor="Transparent"
+                         Command="{Binding ShowPanelCommand}"
+                         CommandParameter="Settings"
+                         ToolTipProperties.Text="Settings"/>
+
+        </VerticalStackLayout>
+    </Grid>
 </ContentView>

@@ -168,6 +168,101 @@ public class RoslynLanguageService : IDisposable
     }
 
     /// <summary>
+    /// Finds the source definition location for a symbol at the given character position.
+    /// </summary>
+    /// <returns>A <see cref="DefinitionInfo"/> or <c>null</c> if no source definition is found.</returns>
+    public async Task<DefinitionInfo?> GetDefinitionAsync(string filePath, int position)
+    {
+        if (!_documents.TryGetValue(filePath, out var docId))
+            return null;
+
+        var document = _workspace.CurrentSolution.GetDocument(docId);
+        if (document is null) return null;
+
+        var semanticModel = await document.GetSemanticModelAsync();
+        if (semanticModel is null) return null;
+
+        var syntaxRoot = await document.GetSyntaxRootAsync();
+        if (syntaxRoot is null) return null;
+
+        var token = syntaxRoot.FindToken(position);
+        var symbol = semanticModel.GetSymbolInfo(token.Parent!).Symbol
+                  ?? semanticModel.GetDeclaredSymbol(token.Parent!);
+
+        if (symbol is null) return null;
+
+        // Find source definition location
+        var sourceLocation = symbol.Locations.FirstOrDefault(l => l.IsInSource);
+        if (sourceLocation is null) return null;
+
+        var span = sourceLocation.GetLineSpan();
+        return new DefinitionInfo
+        {
+            FilePath = span.Path,
+            StartLine = span.StartLinePosition.Line + 1,
+            StartColumn = span.StartLinePosition.Character + 1,
+            EndLine = span.EndLinePosition.Line + 1,
+            EndColumn = span.EndLinePosition.Character + 1
+        };
+    }
+
+    /// <summary>
+    /// Finds all source usages (references) of the symbol at the given character position.
+    /// </summary>
+    public async Task<List<ReferenceInfo>> GetReferencesAsync(string filePath, int position)
+    {
+        var results = new List<ReferenceInfo>();
+
+        if (!_documents.TryGetValue(filePath, out var docId))
+            return results;
+
+        var document = _workspace.CurrentSolution.GetDocument(docId);
+        if (document is null) return results;
+
+        var semanticModel = await document.GetSemanticModelAsync();
+        if (semanticModel is null) return results;
+
+        var syntaxRoot = await document.GetSyntaxRootAsync();
+        if (syntaxRoot is null) return results;
+
+        var token = syntaxRoot.FindToken(position);
+        var symbol = semanticModel.GetSymbolInfo(token.Parent!).Symbol
+                  ?? semanticModel.GetDeclaredSymbol(token.Parent!);
+
+        if (symbol is null) return results;
+
+        var references = await Microsoft.CodeAnalysis.FindSymbols.SymbolFinder.FindReferencesAsync(symbol, _workspace.CurrentSolution);
+
+        foreach (var referencedSymbol in references)
+        {
+            foreach (var reference in referencedSymbol.Locations)
+            {
+                var span = reference.Location.GetLineSpan();
+                results.Add(new ReferenceInfo
+                {
+                    FilePath = span.Path,
+                    Line = span.StartLinePosition.Line + 1,
+                    Column = span.StartLinePosition.Character + 1
+                });
+            }
+        }
+
+        // Also add the definition itself as a reference
+        foreach (var location in symbol.Locations.Where(l => l.IsInSource))
+        {
+            var span = location.GetLineSpan();
+            results.Add(new ReferenceInfo
+            {
+                FilePath = span.Path,
+                Line = span.StartLinePosition.Line + 1,
+                Column = span.StartLinePosition.Character + 1
+            });
+        }
+
+        return results;
+    }
+
+    /// <summary>
     /// Maps Roslyn completion item tags to Monaco <c>CompletionItemKind</c> numeric values.
     /// </summary>
     /// <param name="tags">The immutable array of Roslyn WellKnownTags for the completion item.</param>
@@ -216,4 +311,26 @@ public class CompletionItemInfo
 
     /// <summary>Gets or sets additional detail text shown beside the completion label.</summary>
     public string? Detail { get; set; }
+}
+
+/// <summary>
+/// Represents the source definition location of a symbol.
+/// </summary>
+public class DefinitionInfo
+{
+    public string FilePath { get; set; } = string.Empty;
+    public int StartLine { get; set; }
+    public int StartColumn { get; set; }
+    public int EndLine { get; set; }
+    public int EndColumn { get; set; }
+}
+
+/// <summary>
+/// Represents a single reference (usage) of a symbol in source code.
+/// </summary>
+public class ReferenceInfo
+{
+    public string FilePath { get; set; } = string.Empty;
+    public int Line { get; set; }
+    public int Column { get; set; }
 }

@@ -37,6 +37,10 @@ public class ExplorerViewModel : BaseViewModel
 
     public ICommand RefreshCommand { get; }
     public ICommand OpenFolderCommand { get; }
+    public ICommand CreateFileCommand { get; }
+    public ICommand CreateFolderCommand { get; }
+    public ICommand RenameCommand { get; }
+    public ICommand DeleteCommand { get; }
 
     /// <summary>
     /// Event raised when a file should be opened in the editor.
@@ -51,6 +55,10 @@ public class ExplorerViewModel : BaseViewModel
 
         RefreshCommand = new AsyncRelayCommand(LoadFilesAsync);
         OpenFolderCommand = new AsyncRelayCommand(PickAndOpenFolderAsync);
+        CreateFileCommand = new AsyncRelayCommand<FileItem>(CreateFileAsync);
+        CreateFolderCommand = new AsyncRelayCommand<FileItem>(CreateFolderAsync);
+        RenameCommand = new AsyncRelayCommand<FileItem>(RenameAsync);
+        DeleteCommand = new AsyncRelayCommand<FileItem>(DeleteAsync);
     }
 
     /// <summary>
@@ -124,6 +132,92 @@ public class ExplorerViewModel : BaseViewModel
         catch (Exception ex)
         {
             System.Diagnostics.Debug.WriteLine($"Failed to open file: {ex.Message}");
+        }
+    }
+
+    private async Task CreateFileAsync(FileItem? parent)
+    {
+        var page = Application.Current?.Windows[0].Page;
+        if (page == null) return;
+
+        string? dir = parent?.IsDirectory == true ? parent.FullPath : CurrentPath;
+        if (string.IsNullOrEmpty(dir)) return;
+
+        string name = await page.DisplayPromptAsync("New File", "Enter file name:");
+        if (string.IsNullOrEmpty(name)) return;
+
+        try
+        {
+            var path = Path.Combine(dir, name);
+            await _fileSystemService.CreateFileAsync(path);
+            await LoadFilesAsync();
+        }
+        catch (Exception ex)
+        {
+            await page.DisplayAlertAsync("Error", $"Could not create file: {ex.Message}", "OK");
+        }
+    }
+
+    private async Task CreateFolderAsync(FileItem? parent)
+    {
+        var page = Application.Current?.Windows[0].Page;
+        if (page == null) return;
+
+        string? dir = parent?.IsDirectory == true ? parent.FullPath : CurrentPath;
+        if (string.IsNullOrEmpty(dir)) return;
+
+        string name = await page.DisplayPromptAsync("New Folder", "Enter folder name:");
+        if (string.IsNullOrEmpty(name)) return;
+
+        try
+        {
+            var path = Path.Combine(dir, name);
+            _fileSystemService.CreateDirectory(path);
+            await LoadFilesAsync();
+        }
+        catch (Exception ex)
+        {
+            await page.DisplayAlertAsync("Error", $"Could not create folder: {ex.Message}", "OK");
+        }
+    }
+
+    private async Task RenameAsync(FileItem item)
+    {
+        var page = Application.Current?.Windows[0].Page;
+        if (page == null) return;
+
+        string newName = await page.DisplayPromptAsync("Rename", "Enter new name:", initialValue: item.Name);
+        if (string.IsNullOrEmpty(newName) || newName == item.Name) return;
+
+        try
+        {
+            var parent = Path.GetDirectoryName(item.FullPath) ?? "";
+            var newPath = Path.Combine(parent, newName);
+            await _fileSystemService.RenameAsync(item.FullPath, newPath);
+            await LoadFilesAsync();
+        }
+        catch (Exception ex)
+        {
+            await page.DisplayAlertAsync("Error", $"Could not rename: {ex.Message}", "OK");
+        }
+    }
+
+    private async Task DeleteAsync(FileItem item)
+    {
+        var page = Application.Current?.Windows[0].Page;
+        if (page == null) return;
+
+        bool confirm = await page.DisplayAlertAsync("Delete", $"Are you sure you want to delete '{item.Name}'?", "Delete", "Cancel");
+        if (!confirm) return;
+
+        try
+        {
+            await _fileSystemService.DeleteAsync(item.FullPath);
+            await LoadFilesAsync();
+        }
+        catch (Exception ex)
+        {
+            await page.DisplayAlertAsync("Error", $"Could not delete: {ex.Message}", "OK");
         }
     }
 }

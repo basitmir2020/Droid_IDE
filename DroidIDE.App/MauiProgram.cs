@@ -58,7 +58,14 @@ public static class MauiProgram
         builder.Services.AddSingleton<RefactoringService>();
 
         // ── Git Services ──
-        builder.Services.AddSingleton<IGitService, GitService>();
+        builder.Services.AddSingleton<CliGitService>();
+        builder.Services.AddSingleton<IGitService>(sp => 
+        {
+            var fallback = sp.GetRequiredService<CliGitService>();
+            var useFallback = DeviceInfo.Current.Platform == DevicePlatform.Android || 
+                              DeviceInfo.Current.Platform == DevicePlatform.iOS;
+            return new SafeGitService(fallback, useFallback);
+        });
         builder.Services.AddSingleton<BranchManager>();
         builder.Services.AddSingleton<RepositoryManager>();
 
